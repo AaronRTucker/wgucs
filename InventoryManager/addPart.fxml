@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="648.0" prefWidth="508.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <Label layoutX="31.0" layoutY="36.0" text="Add Part" />
+        <Button fx:id="modifyCancel" layoutX="334.0" layoutY="443.0" mnemonicParsing="false" onAction="#addPartCancelPressed" text="Cancel" />
+        <Label layoutX="49.0" layoutY="178.0" text="ID" />
+        <Label layoutX="45.0" layoutY="213.0" text="Name" />
+        <Label layoutX="47.0" layoutY="251.0" text="Inv" />
+        <Label layoutX="50.0" layoutY="288.0" text="Price" />
+        <Label layoutX="52.0" layoutY="326.0" text="Max" />
+        <Label layoutX="241.0" layoutY="326.0" text="Min" />
+        <TextField fx:id="partIdField" layoutX="146.0" layoutY="174.0" />
+        <TextField fx:id="partNameField" layoutX="146.0" layoutY="209.0" />
+        <TextField fx:id="partInvField" layoutX="146.0" layoutY="247.0" prefHeight="25.0" prefWidth="77.0" />
+        <TextField fx:id="partPriceField" layoutX="146.0" layoutY="284.0" prefHeight="25.0" prefWidth="77.0" />
+        <TextField fx:id="partMaxField" layoutX="146.0" layoutY="322.0" prefHeight="25.0" prefWidth="77.0" />
+        <TextField fx:id="partMinField" layoutX="279.0" layoutY="322.0" prefHeight="25.0" prefWidth="77.0" />
+        <Button fx:id="modifyCancel2" layoutX="241.0" layoutY="443.0" mnemonicParsing="false" onAction="#addPartSavePressed" text="Save" />
+      <RadioButton fx:id="inHouseBtn" layoutX="144.0" layoutY="36.0" mnemonicParsing="false" onAction="#inHouseSelected" selected="true" text="In-House">
+         <toggleGroup>
+            <ToggleGroup fx:id="toggleGroup1" />
+         </toggleGroup></RadioButton>
+      <RadioButton fx:id="outsourcedBtn" layoutX="283.0" layoutY="36.0" mnemonicParsing="false" onAction="#outsourcedSelected" text="Outsourced" toggleGroup="$toggleGroup1" />
+      <Label fx:id="varField" layoutX="50.0" layoutY="363.0" text="Machine ID " />
+      <TextField fx:id="partSourcedField" layoutX="146.0" layoutY="359.0" />
+    </children>
+</AnchorPane>
