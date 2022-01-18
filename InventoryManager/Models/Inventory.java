@@ -1,4 +1,4 @@
-package InventoryManager; /**
+package InventoryManager.Models; /**
  * Inventory.java
  */
 
@@ -9,8 +9,6 @@ package InventoryManager; /**
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import java.util.ArrayList;
 
 public class Inventory {
     private ObservableList<Part> allParts;

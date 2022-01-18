@@ -1,13 +1,12 @@
 package InventoryManager;
 
+import InventoryManager.Controllers.Controller;
+import InventoryManager.Models.Inventory;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-
-import java.util.Objects;
 
 
 public class Main extends Application{
@@ -20,7 +19,7 @@ public class Main extends Application{
         try {
             primaryStage.setTitle("Inventory Manager");
             Inventory inventory = new Inventory();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("gui.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Views/gui.fxml"));
             Controller controller = new Controller(inventory);
             loader.setController(controller);
             //Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("gui.fxml")));

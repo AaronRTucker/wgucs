@@ -1,4 +1,4 @@
-package InventoryManager;
+package InventoryManager.Models;
 
 public class InHouse extends Part{
 

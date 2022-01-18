@@ -1,4 +1,4 @@
-package InventoryManager;
+package InventoryManager.Models;
 
 public class Outsourced extends Part{
 

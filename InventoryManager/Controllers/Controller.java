@@ -1,8 +1,7 @@
-package InventoryManager;
+package InventoryManager.Controllers;
 
+import InventoryManager.Models.*;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -89,15 +88,15 @@ public class Controller implements Initializable {
     @FXML
     public void addPartButtonPressed(ActionEvent event) throws IOException{
         System.out.println("Open add part screen");
-        /*
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("addPart.fxml")));
-        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-        */
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("addPart.fxml"));
+        //root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("../Views/addPart.fxml")));
+        //stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+        //scene = new Scene(root);
+        //stage.setScene(scene);
+        //stage.show();
+
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../Views/addPart.fxml"));
         //Controller c = new Controller(inventory);
         loader.setController(this);
         scene = new Scene((Pane)loader.load(), 900,475);
@@ -105,6 +104,8 @@ public class Controller implements Initializable {
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         stage.setScene(scene);
         stage.show();
+
+
     }
 
     @FXML
@@ -202,9 +203,12 @@ public class Controller implements Initializable {
     @FXML
     public void addPartCancelPressed(ActionEvent event) throws IOException{
         System.out.println("Part Cancel Pressed");
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("gui.fxml")));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../Views/gui.fxml"));
+        //Controller c = new Controller(inventory);
+        loader.setController(this);
+        scene = new Scene((Pane)loader.load(), 900,475);
+        System.out.println(stage);
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
         stage.setScene(scene);
         stage.show();
     }
