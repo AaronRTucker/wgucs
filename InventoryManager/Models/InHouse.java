@@ -23,4 +23,8 @@ public class InHouse extends Part{
         return machineId;
     }
 
+    public String getSource(){
+        return String.valueOf(machineId);
+    }
+
 }
