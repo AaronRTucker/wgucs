@@ -108,6 +108,5 @@ public abstract class Part {
         this.max = max;
     }
 
-    public abstract String getSource();
 
 }

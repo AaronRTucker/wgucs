@@ -23,7 +23,4 @@ public class Outsourced extends Part{
         return companyName;
     }
 
-    public String getSource(){
-        return companyName;
-    }
 }

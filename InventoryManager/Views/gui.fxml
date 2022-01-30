@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="854.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="854.0" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1">
 <children>
     <TableView fx:id="partsTable" layoutX="15.0" layoutY="111.0" prefHeight="200.0" prefWidth="390.0">
         <columns>
@@ -15,10 +15,10 @@
     </TableView>
     <TableView fx:id="productsTable" layoutX="412.0" layoutY="111.0" prefHeight="200.0" prefWidth="427.0">
         <columns>
-            <TableColumn prefWidth="75.0" text="Product ID" />
-            <TableColumn prefWidth="95.0" text="Product Name" />
-            <TableColumn prefWidth="93.0" text="Inventory Level" />
-            <TableColumn prefWidth="151.0" text="Price / Cost per Unit" />
+            <TableColumn fx:id="productIdCol" prefWidth="75.0" text="Product ID" />
+            <TableColumn fx:id="productNameCol" prefWidth="95.0" text="Product Name" />
+            <TableColumn fx:id="productInvCol" prefWidth="93.0" text="Inventory Level" />
+            <TableColumn fx:id="productPriceCol" prefWidth="151.0" text="Price / Cost per Unit" />
         </columns>
     </TableView>
     <TextField layoutX="244.0" layoutY="86.0" promptText="Search by Part ID or Name" />
