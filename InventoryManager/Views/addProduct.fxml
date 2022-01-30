@@ -7,7 +7,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="648.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="648.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <Label layoutX="31.0" layoutY="36.0" text="Add Product" />
         <Button fx:id="modifyCancel" layoutX="774.0" layoutY="609.0" mnemonicParsing="false" onAction="#addProductCancelPressed" text="Cancel" />
@@ -42,6 +42,6 @@
         </TableView>
         <Button fx:id="modifyCancel2" layoutX="681.0" layoutY="609.0" mnemonicParsing="false" onAction="#saveProductPressed" text="Save" />
         <Button fx:id="removeAssociatedPartBtn" layoutX="702.0" layoutY="550.0" mnemonicParsing="false" onAction="#removeAssociatedPartPressed" text="Remove Associated Part" />
-        <TextField layoutX="700.0" layoutY="24.0" promptText="Search by Part ID or Name" />
+        <TextField fx:id="partSearchTextField" layoutX="700.0" layoutY="24.0" onKeyTyped="#partSearchKeyTyped" promptText="Search by Part ID or Name" />
     </children>
 </AnchorPane>

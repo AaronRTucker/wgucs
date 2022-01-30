@@ -42,6 +42,6 @@
         </TableView>
         <Button fx:id="modifyCancel2" layoutX="681.0" layoutY="609.0" mnemonicParsing="false" onAction="#saveModifyProductPressed" text="Save" />
         <Button fx:id="removeAssociatedPartBtn" layoutX="702.0" layoutY="550.0" mnemonicParsing="false" onAction="#removeAssociatedPartPressed" text="Remove Associated Part" />
-        <TextField layoutX="700.0" layoutY="24.0" promptText="Search by Part ID or Name" />
+        <TextField fx:id="productSearchTextField" layoutX="700.0" layoutY="24.0" onKeyTyped="#partSearchKeyTyped" promptText="Search by Part ID or Name" />
     </children>
 </AnchorPane>

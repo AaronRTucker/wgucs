@@ -4,6 +4,8 @@ import InventoryManager.Models.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -14,6 +16,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.scene.control.TableColumn;
@@ -32,6 +35,7 @@ public class Controller implements Initializable {
     private Scene scene;
     private Parent root;
     private final Inventory inventory;
+
     private int nextPartId;
     private int nextProductId;
     private Part selectedPart;
@@ -83,6 +87,10 @@ public class Controller implements Initializable {
     @FXML private RadioButton inHouseBtn;
     @FXML private RadioButton outsourcedBtn;
 
+    //Search fields
+    @FXML private TextField partSearchTextField;
+    @FXML private TextField productSearchTextField;
+
     //maintain list of temporary associated Parts
     private ObservableList<Part> temporaryAssociatedParts;
 
@@ -100,7 +108,7 @@ public class Controller implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         inHouse = true;
 
-        if(partIdCol != null) {     //check to see if this scene has the parts data table in it
+        if (partIdCol != null) {     //check to see if this scene has the parts data table in it
 
             partIdCol.setCellValueFactory(new PropertyValueFactory<Part, Integer>("id"));
             partNameCol.setCellValueFactory(new PropertyValueFactory<Part, String>("name"));
@@ -109,7 +117,7 @@ public class Controller implements Initializable {
             partsTable.setItems(inventory.getAllParts());
         }
 
-        if(productIdCol != null) {     //check to see if this scene has the parts data table in it
+        if (productIdCol != null) {     //check to see if this scene has the parts data table in it
 
             productIdCol.setCellValueFactory(new PropertyValueFactory<Part, Integer>("id"));
             productNameCol.setCellValueFactory(new PropertyValueFactory<Part, String>("name"));
@@ -118,7 +126,7 @@ public class Controller implements Initializable {
             productsTable.setItems(inventory.getAllProducts());
         }
 
-        if(associatedPartIdCol != null) {     //check to see if this scene has the parts data table in it
+        if (associatedPartIdCol != null) {     //check to see if this scene has the parts data table in it
 
             associatedPartIdCol.setCellValueFactory(new PropertyValueFactory<Part, Integer>("id"));
             associatedPartNameCol.setCellValueFactory(new PropertyValueFactory<Part, String>("name"));
@@ -126,6 +134,51 @@ public class Controller implements Initializable {
             associatedPartPriceCol.setCellValueFactory(new PropertyValueFactory<Part, Double>("price"));
             associatedPartsTable.setItems(temporaryAssociatedParts);
         }
+
+
+        FilteredList<Part> filteredParts = new FilteredList<>(inventory.getAllParts(), p -> true);
+
+        partSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredParts.setPredicate(Part -> {
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (Part.getName().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches first name.
+                }
+                return false; // Does not match.
+            });
+        });
+        SortedList<Part> sortedPartsData = new SortedList<>(filteredParts);
+
+        sortedPartsData.comparatorProperty().bind(partsTable.comparatorProperty());
+
+        partsTable.setItems(sortedPartsData);
+
+
+
+        FilteredList<Product> filteredProducts = new FilteredList<>(inventory.getAllProducts(), p -> true);
+
+        productSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredProducts.setPredicate(Product -> {
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (Product.getName().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches first name.
+                }
+                return false; // Does not match.
+            });
+        });
+        SortedList<Product> sortedProductsData = new SortedList<>(filteredProducts);
+
+        sortedProductsData.comparatorProperty().bind(productsTable.comparatorProperty());
+
+        productsTable.setItems(sortedProductsData);
     }
 
     @FXML
@@ -152,7 +205,8 @@ public class Controller implements Initializable {
     }
 
     public void modifyPartSavePressed(ActionEvent event) throws IOException{
-        partsTable.getItems().remove( selectedPart );
+        //partsTable.getItems().remove( selectedPart );
+        inventory.deletePart(selectedPart);
         addPartSavePressed(event);
     }
 
@@ -240,8 +294,9 @@ public class Controller implements Initializable {
     @FXML
     public void deletePartButton(ActionEvent event)
     {
+        selectedPart = partsTable.getSelectionModel().getSelectedItem();
         inventory.deletePart(selectedPart);
-        partsTable.getItems().remove( partsTable.getSelectionModel().getSelectedItem() );
+        //partsTable.getItems().remove( partsTable.getSelectionModel().getSelectedItem() );
     }
 
 
@@ -291,7 +346,7 @@ public class Controller implements Initializable {
     {
         selectedProduct = productsTable.getSelectionModel().getSelectedItem();
         inventory.deleteProduct(selectedProduct);
-        productsTable.getItems().remove( selectedProduct );
+        //productsTable.getItems().remove( selectedProduct );
     }
 
     @FXML
@@ -368,7 +423,18 @@ public class Controller implements Initializable {
     @FXML
     public void saveModifyProductPressed(ActionEvent event) throws IOException{
         inventory.deleteProduct(selectedProduct);
-        productsTable.getItems().remove( selectedProduct );
+        //productsTable.getItems().remove( selectedProduct );
         saveProductPressed(event);
+    }
+
+    @FXML
+    public void partSearchKeyTyped(KeyEvent event) throws IOException{
+        System.out.println(inventory.getAllParts().size());
+
+    }
+
+    @FXML
+    public void productSearchKeyTyped(KeyEvent event) throws IOException{
+        System.out.println(productSearchTextField.getText());
     }
 }
