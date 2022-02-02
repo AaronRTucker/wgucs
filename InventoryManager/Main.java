@@ -1,3 +1,7 @@
+/**
+ * @author Aaron Tucker
+ */
+
 package InventoryManager;
 
 import InventoryManager.Controllers.Controller;
@@ -12,8 +16,11 @@ import javafx.stage.Stage;
 public class Main extends Application{
 
 
-
-
+    /**
+     * Starts the GUI program and loads the opening stage
+     * @param primaryStage the primary stage
+     * @throws Exception
+     */
     @Override
     public void start(Stage primaryStage) throws Exception{
         try {
@@ -31,6 +38,10 @@ public class Main extends Application{
         }
     }
 
+    /**
+     * Javadoc located in root folder of project zip file
+     * @param args
+     */
     public static void main(String[] args) {
         launch(args);
     }

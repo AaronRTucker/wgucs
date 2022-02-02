@@ -1,3 +1,6 @@
+/**
+ * @author Aaron Tucker
+ */
 package InventoryManager.Models;
 
 import javafx.collections.FXCollections;

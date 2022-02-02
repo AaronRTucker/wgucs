@@ -1,4 +1,5 @@
-package InventoryManager.Models; /**
+
+/**
  * Inventory.java
  */
 
@@ -6,6 +7,8 @@ package InventoryManager.Models; /**
  *
  * @author Aaron Tucker
  */
+
+package InventoryManager.Models;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

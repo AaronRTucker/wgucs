@@ -1,3 +1,9 @@
+/**
+ *
+ * @author Aaron Tucker
+ * @version 7.0
+ */
+
 package InventoryManager.Controllers;
 
 import InventoryManager.Models.*;
@@ -115,6 +121,15 @@ public class Controller implements Initializable {
 
 
 
+
+    /**
+     * Called every time a screen is loaded
+     * @futureenhancement add more search fields to find specific quantities
+     * @runtimeerror discovered that file paths to fxml scenes need to be absolute instead of relative to work
+     * @param url the url
+     * @param resourceBundle the resource bundle
+     * @return void
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         inHouse = true;             //set the default part type radio button to be inHouse
@@ -189,14 +204,24 @@ public class Controller implements Initializable {
         productsTable.setItems(sortedProductsData);
     }
 
+    /**
+     * Handle exiting the application
+     * @param event the action event
+     * @return void
+     */
     @FXML
     public void pressExitButton(ActionEvent event){
         System.out.println("Application exiting");
         Platform.exit();
     }
 
+    /**
+     * Handles adding part
+     * @param event the action event
+     * @return void
+     */
     @FXML
-    public void addPartButtonPressed(ActionEvent event) throws IOException{
+    public void addPartButtonPressed(ActionEvent event){
         loadScene(event, "InventoryManager/Views/addPart.fxml", 900, 475);
 
         //ID will be generated and incremented automatically
@@ -206,17 +231,35 @@ public class Controller implements Initializable {
 
     }
 
-    public void modifyPartSavePressed(ActionEvent event) throws IOException{
+    /**
+     * Handles saving modified part
+     * @param event the action event
+     * @return void
+     */
+    @FXML
+    public void modifyPartSavePressed(ActionEvent event){
         inventory.deletePart(selectedPart);
         addPartSavePressed(event);
     }
+
+    /**
+     * Handles cancelling out of modify part screen
+     * @param event the action event
+     * @throws IOException
+     * @return void
+     */
     @FXML
     public void modifyPartCancelPressed(ActionEvent event) throws IOException{
         addPartCancelPressed(event);
     }
 
+    /**
+     * Handles saving parts
+     * @param event the action event
+     * @return void
+     */
     @FXML
-    public void addPartSavePressed(ActionEvent event) throws IOException{
+    public void addPartSavePressed(ActionEvent event){
         int id = this.nextPartId;
         this.nextPartId++;
 
@@ -253,8 +296,13 @@ public class Controller implements Initializable {
         }
     }
 
+    /**
+     * Handles saving products
+     * @param event the action event
+     * @return void
+     */
     @FXML
-    public void saveProductPressed(ActionEvent event) throws IOException{
+    public void saveProductPressed(ActionEvent event){
         int id = this.nextProductId;
         this.nextProductId++;
 
@@ -290,8 +338,13 @@ public class Controller implements Initializable {
         }
     }
 
+    /**
+     * Handles modifying parts
+     * @param event the action event
+     * @return void
+     */
     @FXML
-    public void modifyPartButton(ActionEvent event) throws IOException {
+    public void modifyPartButton(ActionEvent event){
         selectedPart = partsTable.getSelectionModel().getSelectedItem();
 
         Alert a;
@@ -300,12 +353,7 @@ public class Controller implements Initializable {
             a.setContentText("Please select a part to modify");
             a.show();
         } else {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("InventoryManager/Views/modifyPart.fxml"));
-            loader.setController(this);
-            scene = new Scene((Pane)loader.load(), 900,475);
-            stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
+            loadScene(event, "InventoryManager/Views/modifyPart.fxml", 900, 475);
 
             partIdField.setEditable(false);
             partIdField.setText(String.valueOf(selectedPart.getId()));
@@ -337,6 +385,11 @@ public class Controller implements Initializable {
         }
     }
 
+    /**
+     * Handles deleting parts
+     * @param event the action event
+     * @return void
+     */
     @FXML
     public void deletePartButton(ActionEvent event)
     {
@@ -362,8 +415,13 @@ public class Controller implements Initializable {
     }
 
 
+    /**
+     * Handles adding products
+     * @param event the action event
+     * @return void
+     */
     @FXML
-    public void addProductButtonPressed(ActionEvent event) throws IOException{
+    public void addProductButtonPressed(ActionEvent event){
         loadScene(event,"InventoryManager/Views/addProduct.fxml", 900, 675 );
 
         //ID will be generated and incremented automatically
@@ -372,8 +430,13 @@ public class Controller implements Initializable {
         productIdField.setText(String.valueOf(this.nextProductId));
     }
 
+    /**
+     * Handles modifying products
+     * @param event the action event
+     * @return void
+     */
     @FXML
-    public void modifyProductButton(ActionEvent event) throws IOException{
+    public void modifyProductButton(ActionEvent event){
         Alert a;
         selectedProduct = productsTable.getSelectionModel().getSelectedItem();
         if(selectedProduct == null){
@@ -398,6 +461,11 @@ public class Controller implements Initializable {
 
     }
 
+    /**
+     * Handles deleting products
+     * @param event the action event
+     * @return void
+     */
     @FXML
     public void deleteProductButton(ActionEvent event)
     {
@@ -427,34 +495,73 @@ public class Controller implements Initializable {
     }
 
 
+    /**
+     * Handles switching to inhouse
+     * @param event the action event
+     * @return void
+     */
     @FXML
     public void inHouseSelected(ActionEvent event){
         varField.setText("Machine ID");
         inHouse = true;
     }
 
+    /**
+     * Handles switching to outsourced
+     * @param event the action event
+     * @return void
+     */
     @FXML
     public void outsourcedSelected(ActionEvent event){
         varField.setText("Company Name");
         inHouse = false;
     }
 
+    /**
+     * Handles cancelling out of the add part screen
+     * @param event the action event
+     * @return void
+     */
     @FXML
-    public void addPartCancelPressed(ActionEvent event) throws IOException{
+    public void addPartCancelPressed(ActionEvent event){
         loadScene(event, "InventoryManager/Views/gui.fxml", 900, 475);
     }
 
+    /**
+     * Handles adding a part to a product
+     * @param event the action event
+     * @return void
+     */
     @FXML
-    public void addPartToProductBtnPressed(ActionEvent event) throws IOException{
-        temporaryAssociatedParts.add(partsTable.getSelectionModel().getSelectedItem());
+    public void addPartToProductBtnPressed(ActionEvent event){
+        Part associatedSelectedPart = partsTable.getSelectionModel().getSelectedItem();
+        Alert a;
+        if(associatedSelectedPart == null){
+            a = new Alert(Alert.AlertType.ERROR);
+            a.setContentText("Please select an associated part to add");
+            a.show();
+        } else {
+            temporaryAssociatedParts.add(associatedSelectedPart);
+        }
     }
 
+    /**
+     * Handles cancelling out of the add product screen
+     * @param event the action event
+     * @return void
+     */
     @FXML
-    public void addProductCancelPressed(ActionEvent event) throws IOException{
+    public void addProductCancelPressed(ActionEvent event){
         addPartCancelPressed(event);
     }
+
+    /**
+     * Handles removing an associated part
+     * @param event the action event
+     * @return void
+     */
     @FXML
-    public void removeAssociatedPartPressed(ActionEvent event) throws IOException{
+    public void removeAssociatedPartPressed(ActionEvent event){
         Part associatedSelectedPart = associatedPartsTable.getSelectionModel().getSelectedItem();
         Alert a;
         Optional<ButtonType> result;
@@ -474,20 +581,35 @@ public class Controller implements Initializable {
         }
     }
 
+    /**
+     * Handles cancelling out of modify scenes
+     * @param event the action event
+     * @return void
+     */
     @FXML
     public void modifyCancelPressed(ActionEvent event){
 
     }
 
+    /**
+     * Handles saving product modifications
+     * @param event the action event
+     * @return void
+     */
     @FXML
-    public void saveModifyProductPressed(ActionEvent event) throws IOException{
+    public void saveModifyProductPressed(ActionEvent event){
         inventory.deleteProduct(selectedProduct);
         saveProductPressed(event);
     }
 
+    /**
+     * Handles the part search error messages
+     * @param event the action event
+     * @return void
+     */
     @FXML
     //Handle showing the error messages for no part search results and empty parts data table
-    public void partSearchKeyTyped(KeyEvent event) throws IOException{
+    public void partSearchKeyTyped(KeyEvent event){
         if(!partSearchTextField.getText().isEmpty()){   //if there is something typed in the search box
             if(filteredParts.size() == 0){              //and there are no results
                 partsTable.setPlaceholder(new Label("Nothing found in parts search"));
@@ -497,9 +619,14 @@ public class Controller implements Initializable {
         }
     }
 
+    /**
+     * Handles the product search error messages
+     * @param event the action event
+     * @return void
+     */
     @FXML
     //Handle showing the error messages for no product search results and empty product data table
-    public void productSearchKeyTyped(KeyEvent event) throws IOException{
+    public void productSearchKeyTyped(KeyEvent event){
         if(!productSearchTextField.getText().isEmpty()){
             if(filteredProducts.size() == 0){
                 productsTable.setPlaceholder(new Label("Nothing found in products search"));
@@ -510,14 +637,27 @@ public class Controller implements Initializable {
     }
 
 
+    /**
+     * Loads a new scene with a given file, width, and height
+     * @param event the action event
+     * @param location the location of the scene file
+     * @param width the width of the scene
+     * @param height the height of the scene
+     * @return void
+     * @RUNTIME ERROR
+     */
     //Private helper function
     //Handle switching between fxml file scenes
-    private void loadScene(ActionEvent event, String location, int width, int height) throws IOException{
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(location));      //absolute reference for file path of scene
-        loader.setController(this);
-        scene = new Scene((Pane)loader.load(), width,height);                                       //set width and height of scene
-        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        stage.setScene(scene);
-        stage.show();
+    private void loadScene(ActionEvent event, String location, int width, int height){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(location));      //absolute reference for file path of scene
+            loader.setController(this);
+            scene = new Scene((Pane) loader.load(), width, height);                                       //set width and height of scene
+            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException exception){
+            System.out.println(exception);
+        }
     }
 }

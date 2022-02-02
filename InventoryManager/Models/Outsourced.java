@@ -1,3 +1,7 @@
+/**
+ * @author Aaron Tucker
+ */
+
 package InventoryManager.Models;
 
 public class Outsourced extends Part{
