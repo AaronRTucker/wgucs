@@ -262,39 +262,36 @@ public class Controller implements Initializable {
     public void addPartSavePressed(ActionEvent event){
         int id = this.nextPartId;
         this.nextPartId++;
+            try {
+                String name = partNameField.getText();
+                double price = Double.parseDouble(partPriceField.getText());
+                int stock = Integer.parseInt(partInvField.getText());
+                int min = Integer.parseInt(partMinField.getText());
+                int max = Integer.parseInt(partMaxField.getText());
 
-        try{
-            String name = partNameField.getText();
-            double price = Double.parseDouble(partPriceField.getText());
-            int stock = Integer.parseInt(partInvField.getText());
-            int min = Integer.parseInt(partMinField.getText());
-            int max = Integer.parseInt(partMaxField.getText());
+                if (stock < min || stock > max) {
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setContentText("Inventory must be between min and max levels");
+                    a.show();
+                } else {
+                    if (inHouse) {
+                        int machineId = Integer.parseInt(partSourcedField.getText());
+                        InHouse newInPart = new InHouse(id, name, price, stock, min, max, machineId);
+                        this.inventory.addPart(newInPart);
 
-            if(stock < min || stock > max){
+                    } else {
+                        String companyName = partSourcedField.getText();
+                        Outsourced newOutPart = new Outsourced(id, name, price, stock, min, max, companyName);
+                        this.inventory.addPart(newOutPart);
+                    }
+                    addPartCancelPressed(event);        //return to home screen if there are no errors
+                }
+            } catch (Exception e) {
                 Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setContentText("Inventory must be between min and max levels");
+                a.setContentText("Inappropriate user input: " + e.getMessage());
                 a.show();
             }
-
-
-            if (inHouse) {
-                int machineId = Integer.parseInt(partSourcedField.getText());
-                InHouse newInPart = new InHouse(id, name, price, stock, min, max, machineId);
-                this.inventory.addPart(newInPart);
-
-            } else {
-                String companyName = partSourcedField.getText();
-                Outsourced newOutPart = new Outsourced(id, name, price, stock, min, max, companyName);
-                this.inventory.addPart(newOutPart);
-            }
-            addPartCancelPressed(event);        //return to home screen if there are no errors
-
-        } catch(Exception e){
-            Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Inappropriate user input: " + e.getMessage());
-            a.show();
         }
-    }
 
     /**
      * Handles saving products
@@ -311,7 +308,6 @@ public class Controller implements Initializable {
         int stock;
         int min;
         int max;
-
         try {
             name = productNameField.getText();
             price = Double.parseDouble(productPriceField.getText());
@@ -323,15 +319,15 @@ public class Controller implements Initializable {
                 Alert a = new Alert(Alert.AlertType.ERROR);
                 a.setContentText("Inventory must be between min and max levels");
                 a.show();
-            } else {
+            }else{
                 Product newProduct = new Product(id, name, price, stock, min, max);
-                for(int i = 0; i< temporaryAssociatedParts.size(); i++){
+                for (int i = 0; i < temporaryAssociatedParts.size(); i++) {
                     newProduct.addAssociatedPart(temporaryAssociatedParts.get(i));
                 }
                 this.inventory.addProduct(newProduct);
                 addPartCancelPressed(event);        //return to home screen if there are no errors
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             Alert a = new Alert(Alert.AlertType.ERROR);
             a.setContentText("Inappropriate user input: " + e.getMessage());
             a.show();
