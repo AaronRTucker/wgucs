@@ -6,6 +6,7 @@
 
 package InventoryManager.Controllers;
 
+import InventoryManager.DBHelper.JDBC;
 import InventoryManager.Models.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -213,6 +214,7 @@ public class Controller implements Initializable {
     public void pressExitButton(ActionEvent event){
         System.out.println("Application exiting");
         Platform.exit();
+        JDBC.closeConnection();
     }
 
     /**

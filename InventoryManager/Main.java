@@ -5,6 +5,7 @@
 package InventoryManager;
 
 import InventoryManager.Controllers.Controller;
+import InventoryManager.DBHelper.JDBC;
 import InventoryManager.Models.Inventory;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -24,6 +25,7 @@ public class Main extends Application{
     @Override
     public void start(Stage primaryStage) throws Exception{
         try {
+            JDBC.openConnection();
             primaryStage.setTitle("Inventory Manager");
             Inventory inventory = new Inventory();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Views/gui.fxml"));
@@ -35,6 +37,7 @@ public class Main extends Application{
             primaryStage.show();
         } catch (Exception e){
             e.printStackTrace();    //runs when there is no gui.fxml to load
+            JDBC.closeConnection();
         }
     }
 

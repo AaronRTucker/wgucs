@@ -10,27 +10,28 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="file://$USER_HOME$/Desktop/openjfx-11.0.2_windows-x64_bin-sdk/javafx-sdk-11.0.2/lib" />
+          <root url="file://$PATH_TO_FX$" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$USER_HOME$/Desktop/openjfx-11.0.2_windows-x64_bin-sdk/javafx-sdk-11.0.2/lib" />
+          <root url="file://$PATH_TO_FX$" />
         </SOURCES>
-        <jarDirectory url="file://$USER_HOME$/Desktop/openjfx-11.0.2_windows-x64_bin-sdk/javafx-sdk-11.0.2/lib" recursive="false" />
-        <jarDirectory url="file://$USER_HOME$/Desktop/openjfx-11.0.2_windows-x64_bin-sdk/javafx-sdk-11.0.2/lib" recursive="false" type="SOURCES" />
+        <jarDirectory url="file://$PATH_TO_FX$" recursive="false" />
+        <jarDirectory url="file://$PATH_TO_FX$" recursive="false" type="SOURCES" />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="file://$PATH_TO_FX$" />
+          <root url="file://$MODULE_DIR$/../javafx-sdk-18.0.1/lib" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
-        <jarDirectory url="file://$PATH_TO_FX$" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/../javafx-sdk-18.0.1/lib" recursive="false" />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="javafx17" level="application" />
-    <orderEntry type="library" name="lib1" level="project" />
+    <orderEntry type="library" name="lib" level="application" />
+    <orderEntry type="library" name="javafx11" level="application" />
+    <orderEntry type="library" name="mysql-connector-java-8.0.29" level="project" />
   </component>
 </module>
