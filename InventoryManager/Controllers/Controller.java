@@ -120,6 +120,11 @@ public class Controller implements Initializable {
     }
 
 
+    //LOGIN EVENT HANDLERS
+
+
+
+
 
 
 
@@ -133,6 +138,7 @@ public class Controller implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         inHouse = true;             //set the default part type radio button to be inHouse
 
         //Change default table placeholder messages
@@ -203,6 +209,8 @@ public class Controller implements Initializable {
         SortedList<Product> sortedProductsData = new SortedList<>(filteredProducts);
         sortedProductsData.comparatorProperty().bind(productsTable.comparatorProperty());
         productsTable.setItems(sortedProductsData);
+
+
     }
 
     /**
@@ -215,6 +223,16 @@ public class Controller implements Initializable {
         System.out.println("Application exiting");
         Platform.exit();
         JDBC.closeConnection();
+    }
+
+    /**
+     * Handle logging into the application
+     * @param event the action event
+     * @return void
+     */
+    @FXML
+    public void loginSubmitPressed(ActionEvent event){
+        System.out.println("Logging in");
     }
 
     /**

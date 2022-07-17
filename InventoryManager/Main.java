@@ -4,7 +4,7 @@
 
 package InventoryManager;
 
-import InventoryManager.Controllers.Controller;
+import InventoryManager.Controllers.*;
 import InventoryManager.DBHelper.JDBC;
 import InventoryManager.Models.Inventory;
 import javafx.application.Application;
@@ -28,11 +28,11 @@ public class Main extends Application{
             JDBC.openConnection();
             primaryStage.setTitle("Inventory Manager");
             Inventory inventory = new Inventory();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Views/gui.fxml"));
-            Controller controller = new Controller(inventory);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Views/userLogin.fxml"));
+            LoginController controller = new LoginController();
             loader.setController(controller);
             //Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("gui.fxml")));
-            Scene scene = new Scene((Pane)loader.load(), 900,475);
+            Scene scene = new Scene((Pane)loader.load(), 600,375);
             primaryStage.setScene(scene);
             primaryStage.show();
         } catch (Exception e){
