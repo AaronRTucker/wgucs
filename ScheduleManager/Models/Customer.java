@@ -1,7 +1,7 @@
 package ScheduleManager.Models;
 
 /**
- * Supplied class Part.java
+ * Supplied class derived from part class from previous semester
  */
 
 /**

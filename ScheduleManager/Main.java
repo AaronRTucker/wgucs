@@ -6,7 +6,7 @@ package ScheduleManager;
 
 import ScheduleManager.Controllers.*;
 import ScheduleManager.DBHelper.JDBC;
-import ScheduleManager.Models.Inventory;
+import ScheduleManager.Models.Schedule;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -41,7 +41,7 @@ public class Main extends Application{
                 primaryStage.setTitle("Schedule Manager");
             }
             System.out.println(ZoneId.systemDefault());
-            Inventory inventory = new Inventory();
+            Schedule schedule = new Schedule();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Views/userLogin.fxml"), bundle);
             LoginController controller = new LoginController();
             loader.setController(controller);
