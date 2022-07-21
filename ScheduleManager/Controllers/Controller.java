@@ -4,10 +4,10 @@
  * @version 7.0
  */
 
-package InventoryManager.Controllers;
+package ScheduleManager.Controllers;
 
-import InventoryManager.DBHelper.JDBC;
-import InventoryManager.Models.*;
+import ScheduleManager.DBHelper.JDBC;
+import ScheduleManager.Models.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,7 +33,6 @@ import javafx.scene.control.TableView;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -242,7 +241,7 @@ public class Controller implements Initializable {
      */
     @FXML
     public void addPartButtonPressed(ActionEvent event){
-        loadScene(event, "InventoryManager/Views/addPart.fxml", 900, 475);
+        loadScene(event, "ScheduleManager/Views/addPart.fxml", 900, 475);
 
         //ID will be generated and incremented automatically
         //this code has to be run after the stage has been swapped, if run before it will throw a null error
@@ -369,7 +368,7 @@ public class Controller implements Initializable {
             a.setContentText("Please select a part to modify");
             a.show();
         } else {
-            loadScene(event, "InventoryManager/Views/modifyPart.fxml", 900, 475);
+            loadScene(event, "ScheduleManager/Views/modifyPart.fxml", 900, 475);
 
             partIdField.setEditable(false);
             partIdField.setText(String.valueOf(selectedPart.getId()));
@@ -438,7 +437,7 @@ public class Controller implements Initializable {
      */
     @FXML
     public void addProductButtonPressed(ActionEvent event){
-        loadScene(event,"InventoryManager/Views/addProduct.fxml", 900, 675 );
+        loadScene(event, "ScheduleManager/Views/addProduct.fxml", 900, 675 );
 
         //ID will be generated and incremented automatically
         //this code has to be run after the stage has been swapped, if run before it will throw a null error
@@ -461,7 +460,7 @@ public class Controller implements Initializable {
             a.show();
         } else {
             temporaryAssociatedParts = selectedProduct.getAllAssociatedParts();
-            loadScene(event, "InventoryManager/Views/modifyProduct.fxml", 900, 675);
+            loadScene(event, "ScheduleManager/Views/modifyProduct.fxml", 900, 675);
 
             //ID will be generated and incremented automatically
             //this code has to be run after the stage has been swapped, if run before it will throw a null error
@@ -540,7 +539,7 @@ public class Controller implements Initializable {
      */
     @FXML
     public void addPartCancelPressed(ActionEvent event){
-        loadScene(event, "InventoryManager/Views/gui.fxml", 900, 475);
+        loadScene(event, "ScheduleManager/Views/gui.fxml", 900, 475);
     }
 
     /**

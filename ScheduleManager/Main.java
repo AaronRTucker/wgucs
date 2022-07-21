@@ -2,16 +2,20 @@
  * @author Aaron Tucker
  */
 
-package InventoryManager;
+package ScheduleManager;
 
-import InventoryManager.Controllers.*;
-import InventoryManager.DBHelper.JDBC;
-import InventoryManager.Models.Inventory;
+import ScheduleManager.Controllers.*;
+import ScheduleManager.DBHelper.JDBC;
+import ScheduleManager.Models.Inventory;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+
+import java.time.ZoneId;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 
 public class Main extends Application{
@@ -25,10 +29,16 @@ public class Main extends Application{
     @Override
     public void start(Stage primaryStage) throws Exception{
         try {
+
+            Locale currentLocale = Locale.getDefault();
+            currentLocale = new Locale("fr");
+            ResourceBundle bundle = ResourceBundle.getBundle("ScheduleManager.Resources.language", currentLocale);
+
             JDBC.openConnection();
-            primaryStage.setTitle("Inventory Manager");
+            primaryStage.setTitle("Schedule Manager");
+            System.out.println(ZoneId.systemDefault());
             Inventory inventory = new Inventory();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Views/userLogin.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Views/userLogin.fxml"), bundle);
             LoginController controller = new LoginController();
             loader.setController(controller);
             //Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("gui.fxml")));

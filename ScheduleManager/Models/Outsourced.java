@@ -2,7 +2,7 @@
  * @author Aaron Tucker
  */
 
-package InventoryManager.Models;
+package ScheduleManager.Models;
 
 public class Outsourced extends Part{
 

@@ -4,15 +4,11 @@
  * @version 7.0
  */
 
-package InventoryManager.Controllers;
+package ScheduleManager.Controllers;
 
-import InventoryManager.DBHelper.JDBC;
-import InventoryManager.Models.*;
-import com.mysql.cj.x.protobuf.MysqlxPrepare;
+import ScheduleManager.DBHelper.JDBC;
+import ScheduleManager.Models.*;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,7 +17,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -30,7 +25,7 @@ import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Optional;
+import java.time.ZoneId;
 import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
@@ -38,6 +33,7 @@ public class LoginController implements Initializable {
     private Stage stage;
     private Scene scene;
     private Parent root;
+    private ResourceBundle bundle;
 
 
     /* FXML definitions to link variables from fxml files to the controller*/
@@ -46,6 +42,8 @@ public class LoginController implements Initializable {
     //Login fields
     @FXML private TextField loginNameField;
     @FXML private TextField loginPasswordField;
+
+    @FXML private TextField zoneID;
 
 
     //Constructor for new LoginController object
@@ -66,7 +64,8 @@ public class LoginController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        bundle = resourceBundle;        //save resource bundle to use in callback functions
+        zoneID.setText(String.valueOf(ZoneId.systemDefault()));
 
     }
 
@@ -104,16 +103,20 @@ public class LoginController implements Initializable {
                 password = null;
                 userFound = false;
                 Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setContentText("No user with that name found");
+                a.setTitle(bundle.getString("Error"));
+                a.setHeaderText(bundle.getString("Error"));
+                a.setContentText(bundle.getString("NoUserFound"));
                 a.show();
             }
 
             if(userFound) {
                 if (loginPasswordField.getText().equals(password)) {        //insecure, should be checked on database if you don't trust the client
-                    loadScene(event, "InventoryManager/Views/gui.fxml", 900, 675);
+                    loadScene(event, "ScheduleManager/Views/gui.fxml", 900, 675);
                 } else {
                     Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setContentText("Incorrect Password.");
+                    a.setTitle(bundle.getString("Error"));
+                    a.setHeaderText(bundle.getString("Error"));
+                    a.setContentText(bundle.getString("IncorrectPassword"));
                     a.show();
                 }
             }

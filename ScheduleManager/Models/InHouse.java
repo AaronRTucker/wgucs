@@ -1,4 +1,4 @@
-package InventoryManager.Models;
+package ScheduleManager.Models;
 
 public class InHouse extends Part{
 

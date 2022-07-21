@@ -8,7 +8,7 @@
  * @author Aaron Tucker
  */
 
-package InventoryManager.Models;
+package ScheduleManager.Models;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

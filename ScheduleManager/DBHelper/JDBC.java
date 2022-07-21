@@ -1,4 +1,4 @@
-package InventoryManager.DBHelper;
+package ScheduleManager.DBHelper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

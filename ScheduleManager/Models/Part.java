@@ -1,4 +1,4 @@
-package InventoryManager.Models;
+package ScheduleManager.Models;
 
 /**
  * Supplied class Part.java

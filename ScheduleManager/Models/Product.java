@@ -1,13 +1,10 @@
 /**
  * @author Aaron Tucker
  */
-package InventoryManager.Models;
+package ScheduleManager.Models;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableListBase;
-
-import java.util.ArrayList;
 
 public class Product {
     ObservableList<Part> associatedParts;
