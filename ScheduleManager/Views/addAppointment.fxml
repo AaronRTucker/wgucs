@@ -12,7 +12,7 @@
         <Label layoutX="31.0" layoutY="36.0" text="Add Product" />
         <Button fx:id="modifyCancel" layoutX="774.0" layoutY="609.0" mnemonicParsing="false" onAction="#addProductCancelPressed" text="Cancel" />
         <Label layoutX="49.0" layoutY="178.0" text="ID" />
-        <Label layoutX="45.0" layoutY="213.0" text="Name" />
+        <Label layoutX="45.0" layoutY="213.0" text="Title" />
         <Label layoutX="47.0" layoutY="251.0" text="Inv" />
         <Label layoutX="50.0" layoutY="288.0" text="Price" />
         <Label layoutX="52.0" layoutY="326.0" text="Max" />

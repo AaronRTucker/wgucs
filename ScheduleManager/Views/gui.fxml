@@ -3,33 +3,48 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="854.0" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="854.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <TableView fx:id="partsTable" layoutX="15.0" layoutY="111.0" prefHeight="200.0" prefWidth="390.0">
+
+        <TableView fx:id="CustomersTable" layoutX="15.0" layoutY="111.0" prefHeight="200.0" prefWidth="390.0">
             <columns>
-                <TableColumn fx:id="partIdCol" prefWidth="75.0" text="Part ID" />
-                <TableColumn fx:id="partNameCol" prefWidth="75.0" text="Part Name" />
-                <TableColumn fx:id="partInvCol" prefWidth="98.0" text="Inventory Level" />
-                <TableColumn fx:id="partPriceCol" prefWidth="131.0" text="Price / Cost per Unit" />
+                <TableColumn fx:id="CustomerIdCol" prefWidth="75.0" text="ID" />
+                <TableColumn fx:id="CustomerNameCol" prefWidth="75.0" text="%Name" />
+                <TableColumn fx:id="CustomerAddressCol" prefWidth="98.0" text="Address" />
+                <TableColumn fx:id="CustomerPostalCodeCol" prefWidth="131.0" text="Postal Code" />
+                <TableColumn fx:id="CustomerPhoneNumberCol" prefWidth="131.0" text="Phone Number" />
+
+
             </columns>
         </TableView>
-        <TableView fx:id="productsTable" layoutX="412.0" layoutY="111.0" prefHeight="200.0" prefWidth="427.0">
+
+        <TableView fx:id="AppointmentsTable" layoutX="412.0" layoutY="111.0" prefHeight="200.0" prefWidth="427.0">
             <columns>
-                <TableColumn fx:id="productIdCol" prefWidth="75.0" text="Product ID" />
-                <TableColumn fx:id="productNameCol" prefWidth="95.0" text="Product Name" />
-                <TableColumn fx:id="productInvCol" prefWidth="93.0" text="Inventory Level" />
-                <TableColumn fx:id="productPriceCol" prefWidth="151.0" text="Price / Cost per Unit" />
+                <TableColumn fx:id="AppointmentIdCol" prefWidth="75.0" text="Appointment ID" />
+                <TableColumn fx:id="AppointmentTitleCol" prefWidth="95.0" text="Title" />
+                <TableColumn fx:id="AppointmentDescriptionCol" prefWidth="95.0" text="Description" />
+                <TableColumn fx:id="AppointmentLocationCol" prefWidth="95.0" text="Location" />
+                <TableColumn fx:id="AppointmentTypeCol" prefWidth="95.0" text="Type" />
+                <TableColumn fx:id="AppointmentStartCol" prefWidth="95.0" text="Start" />
+                <TableColumn fx:id="AppointmentEndCol" prefWidth="95.0" text="End" />
+                <TableColumn fx:id="AppointmentCustomerIdCol" prefWidth="95.0" text="Customer ID" />
+                <TableColumn fx:id="AppointmentUserIdCol" prefWidth="95.0" text="User ID" />
+
             </columns>
         </TableView>
-        <TextField fx:id="partSearchTextField" layoutX="244.0" layoutY="86.0" onKeyTyped="#partSearchKeyTyped" promptText="Search by Part ID or Name" />
-        <TextField fx:id="productSearchTextField" layoutX="637.0" layoutY="86.0" onKeyTyped="#productSearchKeyTyped" promptText="Search by Product ID or Name" />
+
+        <TextField fx:id="CustomerSearchTextField" layoutX="244.0" layoutY="86.0" onKeyTyped="#CustomerSearchKeyTyped" promptText="Search by customer ID or Name" />
+        <TextField fx:id="AppointmentSearchTextField" layoutX="637.0" layoutY="86.0" onKeyTyped="#AppointmentSearchKeyTyped" promptText="Search by appointment ID or Name" />
         <Button fx:id="exitBtn" layoutX="701.0" layoutY="350.0" mnemonicParsing="false" onAction="#pressExitButton" text="Exit" />
-        <Button fx:id="addPartBtn" layoutX="244.0" layoutY="311.0" mnemonicParsing="false" onAction="#addPartButtonPressed" text="Add" />
-        <Button fx:id="addProdBtn" layoutX="682.0" layoutY="311.0" mnemonicParsing="false" onAction="#addProductButtonPressed" text="Add" />
-        <Button fx:id="modPartBtn" layoutX="292.0" layoutY="311.0" mnemonicParsing="false" onAction="#modifyPartButton" text="Modify" />
-        <Button fx:id="delPartBtn" layoutX="351.0" layoutY="311.0" mnemonicParsing="false" onAction="#deletePartButton" text="Delete" />
-        <Button fx:id="delProdBtn" layoutX="786.0" layoutY="311.0" mnemonicParsing="false" onAction="#deleteProductButton" text="Delete" />
-        <Button fx:id="modProdBtn" layoutX="725.0" layoutY="311.0" mnemonicParsing="false" onAction="#modifyProductButton" text="Modify" />
-        <Label layoutX="40.0" layoutY="32.0" text="Inventory Management System" />
+        <Button fx:id="addCustomerBtn" layoutX="244.0" layoutY="311.0" mnemonicParsing="false" onAction="#addCustomerButtonPressed" text="Add" />
+        <Button fx:id="addAppointmentBtn" layoutX="682.0" layoutY="311.0" mnemonicParsing="false" onAction="#addAppointmentButtonPressed" text="Add" />
+        <Button fx:id="modCustomerBtn" layoutX="292.0" layoutY="311.0" mnemonicParsing="false" onAction="#modifyCustomerButton" text="Modify" />
+        <Button fx:id="delCustomerBtn" layoutX="351.0" layoutY="311.0" mnemonicParsing="false" onAction="#deleteCustomerButton" text="Delete" />
+        <Button fx:id="delAppointmentBtn" layoutX="786.0" layoutY="311.0" mnemonicParsing="false" onAction="#deleteAppointmentButton" text="Delete" />
+        <Button fx:id="modAppointmentBtn" layoutX="725.0" layoutY="311.0" mnemonicParsing="false" onAction="#modifyAppointmentButton" text="Modify" />
+
+        <Label layoutX="40.0" layoutY="32.0" text="%ScheduleManagementSystem" />
+      <Label layoutX="26.0" layoutY="90.0" text="%Customers" />
+
     </children>
 </AnchorPane>

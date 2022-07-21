@@ -35,7 +35,11 @@ public class Main extends Application{
             ResourceBundle bundle = ResourceBundle.getBundle("ScheduleManager.Resources.language", currentLocale);
 
             JDBC.openConnection();
-            primaryStage.setTitle("Schedule Manager");
+            if(currentLocale.getLanguage() == "fr"){
+                primaryStage.setTitle("Gestionnaire d'Horaire");
+            } else {
+                primaryStage.setTitle("Schedule Manager");
+            }
             System.out.println(ZoneId.systemDefault());
             Inventory inventory = new Inventory();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Views/userLogin.fxml"), bundle);

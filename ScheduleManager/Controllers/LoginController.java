@@ -139,9 +139,9 @@ public class LoginController implements Initializable {
     //Handle switching between fxml file scenes
     private void loadScene(ActionEvent event, String location, int width, int height){
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(location));      //absolute reference for file path of scene
-            Inventory inventory = new Inventory();
-            loader.setController(new Controller(inventory));
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(location), bundle);      //absolute reference for file path of scene
+            Schedule schedule = new Schedule();
+            loader.setController(new Controller(schedule));
             scene = new Scene((Pane) loader.load(), width, height);                                       //set width and height of scene
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(scene);

@@ -39,82 +39,92 @@ import java.util.ResourceBundle;
 public class Controller implements Initializable {
 
     private Stage stage;
+
+    private ResourceBundle bundle;
     private Scene scene;
     private Parent root;
-    private final Inventory inventory;
+    private final Schedule schedule;
 
-    private int nextPartId;
-    private int nextProductId;
-    private Part selectedPart;
-    private Product selectedProduct;
+    private int nextCustomerId;
+    private int nextAppointmentId;
+    private Customer selectedCustomer;
+    private Appointment selectedAppointment;
 
-    //maintain list of temporary associated Parts
-    private ObservableList<Part> temporaryAssociatedParts;
+    //maintain list of temporary associated Customers
+    private ObservableList<Customer> temporaryAssociatedCustomers;
 
-    //filtered parts and products list used in searches
-    FilteredList<Part> filteredParts;
-    FilteredList<Product> filteredProducts;
+    //filtered Customers and Appointments list used in searches
+    FilteredList<Customer> filteredCustomers;
+    FilteredList<Appointment> filteredAppointments;
 
     /* FXML definitions to link variables from fxml files to the controller*/
     //
     //
     //main page tables
-    @FXML private TableView<Part> partsTable;
-    @FXML private TableView<Product> productsTable;
-    @FXML private TableView<Part> associatedPartsTable;
+    @FXML private TableView<Customer> CustomersTable;
+    @FXML private TableView<Appointment> AppointmentsTable;
+    @FXML private TableView<Customer> associatedCustomersTable;
 
-    //part table columns
-    @FXML private TableColumn<Part, Integer> partIdCol;
-    @FXML private TableColumn<Part, String> partNameCol;
-    @FXML private TableColumn<Part, Integer> partInvCol;
-    @FXML private TableColumn<Part, Double> partPriceCol;
+    //Customer table columns
+    @FXML private TableColumn<Customer, Integer> CustomerIdCol;
+    @FXML private TableColumn<Customer, String> CustomerNameCol;
+    @FXML private TableColumn<Customer, String> CustomerAddressCol;
+    @FXML private TableColumn<Customer, String> CustomerPostalCodeCol;
+    @FXML private TableColumn<Customer, String> CustomerPhoneNumberCol;
 
-    //product table columns
-    @FXML private TableColumn<Part, Integer> productIdCol;
-    @FXML private TableColumn<Part, String> productNameCol;
-    @FXML private TableColumn<Part, Integer> productInvCol;
-    @FXML private TableColumn<Part, Double> productPriceCol;
+    //Appointment table columns
+    @FXML private TableColumn<Appointment, Integer> AppointmentIdCol;
+    @FXML private TableColumn<Customer, String> AppointmentTitleCol;
+    @FXML private TableColumn<Schedule, String> AppointmentDescriptionCol;
+    @FXML private TableColumn<Schedule, String> AppointmentTypeCol;
+    @FXML private TableColumn<Schedule, String> AppointmentLocationCol;
+    @FXML private TableColumn<Schedule, java.sql.Timestamp> AppointmentStartCol;
+    @FXML private TableColumn<Schedule, java.sql.Timestamp> AppointmentEndCol;
+    @FXML private TableColumn<Schedule, Integer> AppointmentCustomerIdCol;
+    @FXML private TableColumn<Schedule, Integer> AppointmentUserIdCol;
 
-    //associated Parts table columns
-    @FXML private TableColumn<Part, Integer> associatedPartIdCol;
-    @FXML private TableColumn<Part, String> associatedPartNameCol;
-    @FXML private TableColumn<Part, Integer> associatedPartInvCol;
-    @FXML private TableColumn<Part, Double> associatedPartPriceCol;
+    //associated Customers table columns
 
-    //add Part data fields
+    @FXML private TableColumn<Customer, Integer> AssociatedCustomerIdCol;
+    @FXML private TableColumn<Customer, String> AssociatedCustomerNameCol;
+    @FXML private TableColumn<Customer, String> AssociatedCustomerAddressCol;
+    @FXML private TableColumn<Customer, String> AssociatedCustomerPostalCodeCol;
+    @FXML private TableColumn<Customer, String> AssociatedCustomerPhoneNumberCol;
+
+    //add Customer data fields
     @FXML private Label varField;
-    @FXML private TextField partIdField;
-    @FXML private TextField partNameField;
-    @FXML private TextField partInvField;
-    @FXML private TextField partPriceField;
-    @FXML private TextField partMinField;
-    @FXML private TextField partMaxField;
-    @FXML private TextField partSourcedField;
-    private boolean inHouse;
+    @FXML private TextField CustomerIdField;
+    @FXML private TextField CustomerNameField;
+    @FXML private TextField CustomerAddressField;
+    @FXML private TextField CustomerPostalCodeField;
+    @FXML private TextField CustomerPhoneNumberField;
 
-    //add Product data fields
-    @FXML private TextField productIdField;
-    @FXML private TextField productNameField;
-    @FXML private TextField productInvField;
-    @FXML private TextField productPriceField;
-    @FXML private TextField productMinField;
-    @FXML private TextField productMaxField;
 
-    //modify part radio buttons
-    @FXML private RadioButton inHouseBtn;
-    @FXML private RadioButton outsourcedBtn;
+    //add Appointment data fields
+    @FXML private TextField AppointmentIdField;
+    @FXML private TextField AppointmentTitleField;
+    @FXML private TextField AppointmentDescriptionField;
+    @FXML private TextField AppointmentLocationField;
+    @FXML private TextField AppointmentTypeField;
+    @FXML private TextField AppointmentStartField;
+    @FXML private TextField AppointmentEndField;
+    @FXML private TextField AppointmentCustomerIdField;
+    @FXML private TextField AppointmentUserIdField;
+
+
+
 
     //Search fields
-    @FXML private TextField partSearchTextField;
-    @FXML private TextField productSearchTextField;
+    @FXML private TextField CustomerSearchTextField;
+    @FXML private TextField AppointmentSearchTextField;
 
 
     //Constructor for new Controller object
-    public Controller(Inventory inventory){
-        this.nextPartId = 1;                                                    //set the index of the first part and product IDs to be 1
-        this.nextProductId = 1;
-        this.inventory = inventory;                                             //inventory object passed in from Main
-        this.temporaryAssociatedParts = FXCollections.observableArrayList();    //initialize the temporary parts arraylist
+    public Controller(Schedule schedule){
+        this.nextCustomerId = 1;                                                    //set the index of the first Customer and Appointment IDs to be 1
+        this.nextAppointmentId = 1;
+        this.schedule = schedule;                                             //schedule object passed in from Main
+        this.temporaryAssociatedCustomers = FXCollections.observableArrayList();    //initialize the temporary Customers arraylist
 
     }
 
@@ -138,76 +148,85 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        inHouse = true;             //set the default part type radio button to be inHouse
+        bundle = resourceBundle;
+
 
         //Change default table placeholder messages
-        partsTable.setPlaceholder(new Label("Parts inventory is empty"));
-        productsTable.setPlaceholder(new Label("Products inventory is empty"));
+        CustomersTable.setPlaceholder(new Label("Customers list is empty"));
+        AppointmentsTable.setPlaceholder(new Label("Appointments list is empty"));
 
-        if (partIdCol != null) {     //check to see if this scene has the parts data table in it
-            //populate the table with parts data from the inventory
-            partIdCol.setCellValueFactory(new PropertyValueFactory<Part, Integer>("id"));
-            partNameCol.setCellValueFactory(new PropertyValueFactory<Part, String>("name"));
-            partInvCol.setCellValueFactory(new PropertyValueFactory<Part, Integer>("stock"));
-            partPriceCol.setCellValueFactory(new PropertyValueFactory<Part, Double>("price"));
-            partsTable.setItems(inventory.getAllParts());
+        if (CustomerIdCol != null) {     //check to see if this scene has the Customers data table in it
+            //populate the table with Customers data from the schedule
+            CustomerIdCol.setCellValueFactory(new PropertyValueFactory<Customer, Integer>("id"));
+            CustomerNameCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("name"));
+            CustomerAddressCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("address"));
+            CustomerPostalCodeCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("postalCode"));
+            CustomerPhoneNumberCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("phoneNumber"));
+            CustomersTable.setItems(schedule.getAllCustomers());
         }
 
-        if (productIdCol != null) {     //check to see if this scene has the parts data table in it
-            //populate the table with products data from the inventory
-            productIdCol.setCellValueFactory(new PropertyValueFactory<Part, Integer>("id"));
-            productNameCol.setCellValueFactory(new PropertyValueFactory<Part, String>("name"));
-            productInvCol.setCellValueFactory(new PropertyValueFactory<Part, Integer>("stock"));
-            productPriceCol.setCellValueFactory(new PropertyValueFactory<Part, Double>("price"));
-            productsTable.setItems(inventory.getAllProducts());
+        if (AppointmentIdCol != null) {     //check to see if this scene has the Customers data table in it
+            //populate the table with Appointments data from the schedule
+            AppointmentIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+            AppointmentTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+            AppointmentDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+            AppointmentLocationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
+            AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+            AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<>("start"));
+            AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<>("end"));
+            AppointmentCustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
+            AppointmentUserIdCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
+
+            AppointmentsTable.setItems(schedule.getAllAppointments());
         }
 
-        if (associatedPartIdCol != null) {     //check to see if this scene has the parts data table in it
-            //populate the table with data from the temporary associated parts list
-            associatedPartIdCol.setCellValueFactory(new PropertyValueFactory<Part, Integer>("id"));
-            associatedPartNameCol.setCellValueFactory(new PropertyValueFactory<Part, String>("name"));
-            associatedPartInvCol.setCellValueFactory(new PropertyValueFactory<Part, Integer>("stock"));
-            associatedPartPriceCol.setCellValueFactory(new PropertyValueFactory<Part, Double>("price"));
-            associatedPartsTable.setItems(temporaryAssociatedParts);
+        if (AssociatedCustomerIdCol != null) {     //check to see if this scene has the Customers data table in it
+            //populate the table with data from the temporary associated Customers list
+            AssociatedCustomerIdCol.setCellValueFactory(new PropertyValueFactory<Customer, Integer>("id"));
+            AssociatedCustomerNameCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("name"));
+            AssociatedCustomerAddressCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("address"));
+            AssociatedCustomerPostalCodeCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("postalCode"));
+            AssociatedCustomerPhoneNumberCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("phoneNumber"));
+            associatedCustomersTable.setItems(temporaryAssociatedCustomers);
         }
 
-        //Set up anonymous callback function for the event listener on the parts search field
-        filteredParts = new FilteredList<>(inventory.getAllParts(), p -> true);
-        partSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredParts.setPredicate(Part -> {
+        //Set up anonymous callback function for the event listener on the Customers search field
+        filteredCustomers = new FilteredList<>(schedule.getAllCustomers(), p -> true);
+        CustomerSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredCustomers.setPredicate(Customer -> {
                 if (newValue == null || newValue.isEmpty()) {
                     return true;
                 }
                 String lowerCaseFilter = newValue.toLowerCase();
-                if (Part.getName().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Part.getId()))) {    //if search text equals part ID or name
+                if (Customer.getName().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Customer.getId()))) {    //if search text equals Customer ID or name
                     return true; // Filter matches name or ID.
                 }
                 return false; // Doesn't match
             });
         });
-        SortedList<Part> sortedPartsData = new SortedList<>(filteredParts);
-        sortedPartsData.comparatorProperty().bind(partsTable.comparatorProperty());
-        partsTable.setItems(sortedPartsData);
+        SortedList<Customer> sortedCustomersData = new SortedList<>(filteredCustomers);
+        sortedCustomersData.comparatorProperty().bind(CustomersTable.comparatorProperty());
+        CustomersTable.setItems(sortedCustomersData);
 
 
-        //Set up anonymous callback function for the event listener on the products search field
-        filteredProducts = new FilteredList<>(inventory.getAllProducts(), p -> true);
-        productSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredProducts.setPredicate(Product -> {
+        //Set up anonymous callback function for the event listener on the Appointments search field
+        filteredAppointments = new FilteredList<>(schedule.getAllAppointments(), p -> true);
+        AppointmentSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredAppointments.setPredicate(Appointment -> {
                 if (newValue == null || newValue.isEmpty()) {
                     return true;
                 }
                 String lowerCaseFilter = newValue.toLowerCase();
 
-                if (Product.getName().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Product.getId()))) {//if search text equals product ID or name
-                    return true; // Filter matches name or ID.
+                if (Appointment.getTitle().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Appointment.getId()))) {//if search text equals Appointment ID or name
+                    return true; // Filter matches title or ID.
                 }
                 return false; // Filter doesn't match.
             });
         });
-        SortedList<Product> sortedProductsData = new SortedList<>(filteredProducts);
-        sortedProductsData.comparatorProperty().bind(productsTable.comparatorProperty());
-        productsTable.setItems(sortedProductsData);
+        SortedList<Appointment> sortedAppointmentsData = new SortedList<>(filteredAppointments);
+        sortedAppointmentsData.comparatorProperty().bind(AppointmentsTable.comparatorProperty());
+        AppointmentsTable.setItems(sortedAppointmentsData);
 
 
     }
@@ -235,75 +254,68 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Handles adding part
+     * Handles adding Customer
      * @param event the action event
      * @return void
      */
     @FXML
-    public void addPartButtonPressed(ActionEvent event){
-        loadScene(event, "ScheduleManager/Views/addPart.fxml", 900, 475);
+    public void addCustomerButtonPressed(ActionEvent event){
+        loadScene(event, "ScheduleManager/Views/addCustomer.fxml", 900, 475);
 
         //ID will be generated and incremented automatically
         //this code has to be run after the stage has been swapped, if run before it will throw a null error
-        partIdField.setEditable(false);
-        partIdField.setText(String.valueOf(this.nextPartId));
+        CustomerIdField.setEditable(false);
+        CustomerIdField.setText(String.valueOf(this.nextCustomerId));
 
     }
 
     /**
-     * Handles saving modified part
+     * Handles saving modified Customer
      * @param event the action event
      * @return void
      */
     @FXML
-    public void modifyPartSavePressed(ActionEvent event){
-        inventory.deletePart(selectedPart);
-        addPartSavePressed(event);
+    public void modifyCustomerSavePressed(ActionEvent event){
+        schedule.deleteCustomer(selectedCustomer);
+        addCustomerSavePressed(event);
     }
 
     /**
-     * Handles cancelling out of modify part screen
+     * Handles cancelling out of modify Customer screen
      * @param event the action event
      * @throws IOException
      * @return void
      */
     @FXML
-    public void modifyPartCancelPressed(ActionEvent event) throws IOException{
-        addPartCancelPressed(event);
+    public void modifyCustomerCancelPressed(ActionEvent event) throws IOException{
+        addCustomerCancelPressed(event);
     }
 
     /**
-     * Handles saving parts
+     * Handles saving Customers
      * @param event the action event
      * @return void
      */
     @FXML
-    public void addPartSavePressed(ActionEvent event){
-        int id = this.nextPartId;
-        this.nextPartId++;
+    public void addCustomerSavePressed(ActionEvent event){
+        int id = this.nextCustomerId;
+        this.nextCustomerId++;
             try {
-                String name = partNameField.getText();
-                double price = Double.parseDouble(partPriceField.getText());
-                int stock = Integer.parseInt(partInvField.getText());
-                int min = Integer.parseInt(partMinField.getText());
-                int max = Integer.parseInt(partMaxField.getText());
+                String name = CustomerNameField.getText();
+                String address = CustomerAddressField.getText();
+                String postalCode = CustomerPostalCodeField.getText();
+                String phoneNumber = CustomerPhoneNumberField.getText();
 
-                if (stock < min || stock > max) {
+
+
+                if (name.equals("") || address.equals("") || postalCode.equals("") || phoneNumber.equals("")) {
                     Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setContentText("Inventory must be between min and max levels");
+                    a.setContentText("Text Fields must not be empty");
                     a.show();
                 } else {
-                    if (inHouse) {
-                        int machineId = Integer.parseInt(partSourcedField.getText());
-                        InHouse newInPart = new InHouse(id, name, price, stock, min, max, machineId);
-                        this.inventory.addPart(newInPart);
-
-                    } else {
-                        String companyName = partSourcedField.getText();
-                        Outsourced newOutPart = new Outsourced(id, name, price, stock, min, max, companyName);
-                        this.inventory.addPart(newOutPart);
-                    }
-                    addPartCancelPressed(event);        //return to home screen if there are no errors
+                    Customer newCustomer = new Customer(id, name, address, postalCode, phoneNumber);
+                    this.schedule.addCustomer(newCustomer);
+                    addCustomerCancelPressed(event);        //return to home screen if there are no errors
                 }
             } catch (Exception e) {
                 Alert a = new Alert(Alert.AlertType.ERROR);
@@ -313,14 +325,16 @@ public class Controller implements Initializable {
         }
 
     /**
-     * Handles saving products
+     * Handles saving Appointments
      * @param event the action event
      * @return void
      */
     @FXML
-    public void saveProductPressed(ActionEvent event){
-        int id = this.nextProductId;
-        this.nextProductId++;
+    public void saveAppointmentPressed(ActionEvent event){
+
+        /*
+        int id = this.nextAppointmentId;
+        this.nextAppointmentId++;
 
         String name;
         double price;
@@ -328,270 +342,234 @@ public class Controller implements Initializable {
         int min;
         int max;
         try {
-            name = productNameField.getText();
-            price = Double.parseDouble(productPriceField.getText());
-            stock = Integer.parseInt(productInvField.getText());
-            min = Integer.parseInt(productMinField.getText());
-            max = Integer.parseInt(productMaxField.getText());
+            name = AppointmentNameField.getText();
+            price = Double.parseDouble(AppointmentPriceField.getText());
+            stock = Integer.parseInt(AppointmentInvField.getText());
+            min = Integer.parseInt(AppointmentMinField.getText());
+            max = Integer.parseInt(AppointmentMaxField.getText());
 
             if (stock < min || stock > max) {
                 Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setContentText("Inventory must be between min and max levels");
+                a.setContentText("schedule must be between min and max levels");
                 a.show();
             }else{
-                Product newProduct = new Product(id, name, price, stock, min, max);
-                for (int i = 0; i < temporaryAssociatedParts.size(); i++) {
-                    newProduct.addAssociatedPart(temporaryAssociatedParts.get(i));
+                Appointment newAppointment = new Appointment(id, name, price, stock, min, max);
+                for (int i = 0; i < temporaryAssociatedCustomers.size(); i++) {
+                    newAppointment.addAssociatedCustomer(temporaryAssociatedCustomers.get(i));
                 }
-                this.inventory.addProduct(newProduct);
-                addPartCancelPressed(event);        //return to home screen if there are no errors
+                this.schedule.addAppointment(newAppointment);
+                addCustomerCancelPressed(event);        //return to home screen if there are no errors
             }
         } catch (Exception e) {
             Alert a = new Alert(Alert.AlertType.ERROR);
             a.setContentText("Inappropriate user input: " + e.getMessage());
             a.show();
         }
+
+
+         */
     }
 
     /**
-     * Handles modifying parts
+     * Handles modifying Customers
      * @param event the action event
      * @return void
      */
     @FXML
-    public void modifyPartButton(ActionEvent event){
-        selectedPart = partsTable.getSelectionModel().getSelectedItem();
+    public void modifyCustomerButton(ActionEvent event){
+        selectedCustomer = CustomersTable.getSelectionModel().getSelectedItem();
 
         Alert a;
-        if(selectedPart == null){
+        if(selectedCustomer == null){
             a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Please select a part to modify");
+            a.setContentText("Please select a Customer to modify");
             a.show();
         } else {
-            loadScene(event, "ScheduleManager/Views/modifyPart.fxml", 900, 475);
+            loadScene(event, "ScheduleManager/Views/modifyCustomer.fxml", 900, 475);
 
-            partIdField.setEditable(false);
-            partIdField.setText(String.valueOf(selectedPart.getId()));
-            partNameField.setText(selectedPart.getName());
-            partInvField.setText(String.valueOf(selectedPart.getStock()));
-            partMaxField.setText(String.valueOf(selectedPart.getMax()));
-            partMinField.setText(String.valueOf(selectedPart.getMin()));
-            partPriceField.setText(String.valueOf(selectedPart.getPrice()));
-            if(selectedPart.getClass().getName() == "InventoryManager.Models.Outsourced"){
-                Outsourced outsourcedPart = (Outsourced)selectedPart;
-                partSourcedField.setText(outsourcedPart.getCompanyName());
-            } else {
-                InHouse inHousePart = (InHouse)selectedPart;
-                partSourcedField.setText(String.valueOf(inHousePart.getMachineId()));
-            }
+            CustomerIdField.setEditable(false);
+            CustomerIdField.setText(String.valueOf(selectedCustomer.getId()));
+            CustomerNameField.setText(selectedCustomer.getName());
+            CustomerAddressField.setText(selectedCustomer.getAddress());
+            CustomerPhoneNumberField.setText(selectedCustomer.getPhoneNumber());
+            CustomerPostalCodeField.setText(selectedCustomer.getPostalCode());
 
-            //set radio button based on class type
-            if(selectedPart.getClass().getName() == "InventoryManager.Models.InHouse"){
-                varField.setText("Machine ID");
-                inHouse = true;
-
-
-            } else {
-                varField.setText("Company Name");
-                inHouse = false;
-                inHouseBtn.setSelected(false);
-                outsourcedBtn.setSelected(true);
-            }
         }
     }
 
     /**
-     * Handles deleting parts
+     * Handles deleting Customers
      * @param event the action event
      * @return void
      */
     @FXML
-    public void deletePartButton(ActionEvent event)
+    public void deleteCustomerButton(ActionEvent event)
     {
-        selectedPart = partsTable.getSelectionModel().getSelectedItem();
+        selectedCustomer = CustomersTable.getSelectionModel().getSelectedItem();
         Alert a;
         Optional<ButtonType> result;
-        //Handle the error where no part is selected
-        if(selectedPart == null){
+        //Handle the error where no Customer is selected
+        if(selectedCustomer == null){
             a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Please select a part to delete");
+            a.setContentText("Please select a Customer to delete");
             a.show();
         } else {
             a = new Alert(Alert.AlertType.CONFIRMATION);
-            a.setTitle("Part deletion");
-            a.setHeaderText("You are about to delete Part: " + selectedPart.getName());
+            a.setTitle("Customer deletion");
+            a.setHeaderText("You are about to delete Customer: " + selectedCustomer.getName());
             a.setContentText("Are you sure you want to do this?");
             result = a.showAndWait();
             if (result.get() == ButtonType.OK) {
-                inventory.deletePart(selectedPart);
-                //partsTable.getItems().remove( partsTable.getSelectionModel().getSelectedItem() );  //unnecessary, since the view is linked directly to the inventory
+                schedule.deleteCustomer(selectedCustomer);
+                //CustomersTable.getItems().remove( CustomersTable.getSelectionModel().getSelectedItem() );  //unnecessary, since the view is linked directly to the schedule
             }
         }
     }
 
 
     /**
-     * Handles adding products
+     * Handles adding Appointments
      * @param event the action event
      * @return void
      */
     @FXML
-    public void addProductButtonPressed(ActionEvent event){
-        loadScene(event, "ScheduleManager/Views/addProduct.fxml", 900, 675 );
+    public void addAppointmentButtonPressed(ActionEvent event){
+        loadScene(event, "ScheduleManager/Views/addAppointment.fxml", 900, 675 );
 
         //ID will be generated and incremented automatically
         //this code has to be run after the stage has been swapped, if run before it will throw a null error
-        productIdField.setEditable(false);
-        productIdField.setText(String.valueOf(this.nextProductId));
+        AppointmentIdField.setEditable(false);
+        AppointmentIdField.setText(String.valueOf(this.nextAppointmentId));
     }
 
     /**
-     * Handles modifying products
+     * Handles modifying Appointments
      * @param event the action event
      * @return void
      */
     @FXML
-    public void modifyProductButton(ActionEvent event){
+    public void modifyAppointmentButton(ActionEvent event){
         Alert a;
-        selectedProduct = productsTable.getSelectionModel().getSelectedItem();
-        if(selectedProduct == null){
+        selectedAppointment = AppointmentsTable.getSelectionModel().getSelectedItem();
+        if(selectedAppointment == null){
             a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Please select a product to modify");
+            a.setContentText("Please select a Appointment to modify");
             a.show();
         } else {
-            temporaryAssociatedParts = selectedProduct.getAllAssociatedParts();
-            loadScene(event, "ScheduleManager/Views/modifyProduct.fxml", 900, 675);
+            temporaryAssociatedCustomers = selectedAppointment.getAllAssociatedCustomers();
+            loadScene(event, "ScheduleManager/Views/modifyAppointment.fxml", 900, 675);
 
             //ID will be generated and incremented automatically
             //this code has to be run after the stage has been swapped, if run before it will throw a null error
 
-            productIdField.setEditable(false);
-            productIdField.setText(String.valueOf(selectedProduct.getId()));
-            productNameField.setText(selectedProduct.getName());
-            productInvField.setText(String.valueOf(selectedProduct.getStock()));
-            productMaxField.setText(String.valueOf(selectedProduct.getMax()));
-            productMinField.setText(String.valueOf(selectedProduct.getMin()));
-            productPriceField.setText(String.valueOf(selectedProduct.getPrice()));
+            AppointmentIdField.setEditable(false);
+            AppointmentIdField.setText(String.valueOf(selectedAppointment.getId()));
+            AppointmentTitleField.setText(selectedAppointment.getTitle());
+            AppointmentDescriptionField.setText(selectedAppointment.getDescription());
+            AppointmentLocationField.setText(selectedAppointment.getLocation());
+            AppointmentTypeField.setText(selectedAppointment.getType());
+            AppointmentStartField.setText(String.valueOf(selectedAppointment.getStart()));
+            AppointmentEndField.setText(String.valueOf(selectedAppointment.getEnd()));
+            AppointmentCustomerIdField.setText(String.valueOf(selectedAppointment.getCustomerId()));
+            AppointmentUserIdField.setText(String.valueOf(selectedAppointment.getUserId()));
         }
 
     }
 
     /**
-     * Handles deleting products
+     * Handles deleting Appointments
      * @param event the action event
      * @return void
      */
     @FXML
-    public void deleteProductButton(ActionEvent event)
+    public void deleteAppointmentButton(ActionEvent event)
     {
-        selectedProduct = productsTable.getSelectionModel().getSelectedItem();
+        selectedAppointment = AppointmentsTable.getSelectionModel().getSelectedItem();
         Alert a;
         Optional<ButtonType> result;
-        //Handle the error where no product is selected
-        if(selectedProduct == null){
+        //Handle the error where no Appointment is selected
+        if(selectedAppointment == null){
             a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Please select a product to delete");
+            a.setContentText("Please select a Appointment to delete");
             a.show();
-            //Handle the error where a product has associate parts still
-        } else if( selectedProduct.getAllAssociatedParts().size() > 0) {
+            //Handle the error where a Appointment has associate Customers still
+        } else if( selectedAppointment.getAllAssociatedCustomers().size() > 0) {
             a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Cannot delete a product with associated parts");
+            a.setContentText("Cannot delete a Appointment with associated Customers");
             a.show();
         }else{  //everything is checked, just need to confirm deletion
             a = new Alert(Alert.AlertType.CONFIRMATION);
-            a.setTitle("Product deletion");
-            a.setHeaderText("You are about to delete Product: " + selectedProduct.getName());
+            a.setTitle("Appointment deletion");
+            a.setHeaderText("You are about to delete Appointment: " + selectedAppointment.getTitle());
             a.setContentText("Are you sure you want to do this?");
             result = a.showAndWait();
             if (result.get() == ButtonType.OK) {
-                inventory.deleteProduct(selectedProduct);
+                schedule.deleteAppointment(selectedAppointment);
             }
         }
     }
 
 
     /**
-     * Handles switching to inhouse
+     * Handles cancelling out of the add Customer screen
      * @param event the action event
      * @return void
      */
     @FXML
-    public void inHouseSelected(ActionEvent event){
-        varField.setText("Machine ID");
-        inHouse = true;
-    }
-
-    /**
-     * Handles switching to outsourced
-     * @param event the action event
-     * @return void
-     */
-    @FXML
-    public void outsourcedSelected(ActionEvent event){
-        varField.setText("Company Name");
-        inHouse = false;
-    }
-
-    /**
-     * Handles cancelling out of the add part screen
-     * @param event the action event
-     * @return void
-     */
-    @FXML
-    public void addPartCancelPressed(ActionEvent event){
+    public void addCustomerCancelPressed(ActionEvent event){
         loadScene(event, "ScheduleManager/Views/gui.fxml", 900, 475);
     }
 
     /**
-     * Handles adding a part to a product
+     * Handles adding a Customer to a Appointment
      * @param event the action event
      * @return void
      */
     @FXML
-    public void addPartToProductBtnPressed(ActionEvent event){
-        Part associatedSelectedPart = partsTable.getSelectionModel().getSelectedItem();
+    public void addCustomerToAppointmentBtnPressed(ActionEvent event){
+        Customer associatedSelectedCustomer = CustomersTable.getSelectionModel().getSelectedItem();
         Alert a;
-        if(associatedSelectedPart == null){
+        if(associatedSelectedCustomer == null){
             a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Please select an associated part to add");
+            a.setContentText("Please select an associated Customer to add");
             a.show();
         } else {
-            temporaryAssociatedParts.add(associatedSelectedPart);
+            temporaryAssociatedCustomers.add(associatedSelectedCustomer);
         }
     }
 
     /**
-     * Handles cancelling out of the add product screen
+     * Handles cancelling out of the add Appointment screen
      * @param event the action event
      * @return void
      */
     @FXML
-    public void addProductCancelPressed(ActionEvent event){
-        addPartCancelPressed(event);
+    public void addAppointmentCancelPressed(ActionEvent event){
+        addCustomerCancelPressed(event);
     }
 
     /**
-     * Handles removing an associated part
+     * Handles removing an associated Customer
      * @param event the action event
      * @return void
      */
     @FXML
-    public void removeAssociatedPartPressed(ActionEvent event){
-        Part associatedSelectedPart = associatedPartsTable.getSelectionModel().getSelectedItem();
+    public void removeAssociatedCustomerPressed(ActionEvent event){
+        Customer associatedSelectedCustomer = associatedCustomersTable.getSelectionModel().getSelectedItem();
         Alert a;
         Optional<ButtonType> result;
-        if(associatedSelectedPart == null){
+        if(associatedSelectedCustomer == null){
             a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Please select an associated part to remove");
+            a.setContentText("Please select an associated Customer to remove");
             a.show();
         } else {
             a = new Alert(Alert.AlertType.CONFIRMATION);
-            a.setTitle("Associated part deletion");
-            a.setHeaderText("You are about to remove Part: " + associatedSelectedPart.getName());
+            a.setTitle("Associated Customer deletion");
+            a.setHeaderText("You are about to remove Customer: " + associatedSelectedCustomer.getName());
             a.setContentText("Are you sure you want to do this?");
             result = a.showAndWait();
             if (result.get() == ButtonType.OK) {
-                temporaryAssociatedParts.remove( associatedSelectedPart );
+                temporaryAssociatedCustomers.remove( associatedSelectedCustomer );
             }
         }
     }
@@ -607,47 +585,47 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Handles saving product modifications
+     * Handles saving Appointment modifications
      * @param event the action event
      * @return void
      */
     @FXML
-    public void saveModifyProductPressed(ActionEvent event){
-        inventory.deleteProduct(selectedProduct);
-        saveProductPressed(event);
+    public void saveModifyAppointmentPressed(ActionEvent event){
+        schedule.deleteAppointment(selectedAppointment);
+        saveAppointmentPressed(event);
     }
 
     /**
-     * Handles the part search error messages
+     * Handles the Customer search error messages
      * @param event the action event
      * @return void
      */
     @FXML
-    //Handle showing the error messages for no part search results and empty parts data table
-    public void partSearchKeyTyped(KeyEvent event){
-        if(!partSearchTextField.getText().isEmpty()){   //if there is something typed in the search box
-            if(filteredParts.size() == 0){              //and there are no results
-                partsTable.setPlaceholder(new Label("Nothing found in parts search"));
+    //Handle showing the error messages for no Customer search results and empty Customers data table
+    public void CustomerSearchKeyTyped(KeyEvent event){
+        if(!CustomerSearchTextField.getText().isEmpty()){   //if there is something typed in the search box
+            if(filteredCustomers.size() == 0){              //and there are no results
+                CustomersTable.setPlaceholder(new Label("Nothing found in Customers search"));
             }
         } else {  //there is something in the search box but no content
-            partsTable.setPlaceholder(new Label("Parts inventory is empty"));
+            CustomersTable.setPlaceholder(new Label("Customers list is empty"));
         }
     }
 
     /**
-     * Handles the product search error messages
+     * Handles the Appointment search error messages
      * @param event the action event
      * @return void
      */
     @FXML
-    //Handle showing the error messages for no product search results and empty product data table
-    public void productSearchKeyTyped(KeyEvent event){
-        if(!productSearchTextField.getText().isEmpty()){
-            if(filteredProducts.size() == 0){
-                productsTable.setPlaceholder(new Label("Nothing found in products search"));
+    //Handle showing the error messages for no Appointment search results and empty Appointment data table
+    public void AppointmentSearchKeyTyped(KeyEvent event){
+        if(!AppointmentSearchTextField.getText().isEmpty()){
+            if(filteredAppointments.size() == 0){
+                AppointmentsTable.setPlaceholder(new Label("Nothing found in Appointments search"));
             }
         } else {
-            productsTable.setPlaceholder(new Label("Products inventory is empty"));
+            AppointmentsTable.setPlaceholder(new Label("Appointments list is empty"));
         }
     }
 
@@ -665,7 +643,7 @@ public class Controller implements Initializable {
     //Handle switching between fxml file scenes
     private void loadScene(ActionEvent event, String location, int width, int height){
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(location));      //absolute reference for file path of scene
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(location), bundle);      //absolute reference for file path of scene
             loader.setController(this);
             scene = new Scene((Pane) loader.load(), width, height);                                       //set width and height of scene
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
