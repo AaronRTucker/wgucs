@@ -141,7 +141,7 @@ public class LoginController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(location), bundle);      //absolute reference for file path of scene
             Schedule schedule = new Schedule();
-            loader.setController(new Controller(schedule));
+            loader.setController(new GuiController(schedule));
             scene = new Scene((Pane) loader.load(), width, height);                                       //set width and height of scene
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(scene);

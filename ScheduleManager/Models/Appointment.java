@@ -29,6 +29,7 @@ public class Appointment {
     public Appointment(int id, String title, String description, String location, String type, java.sql.Timestamp start, java.sql.Timestamp end, int customerId, int userId){
         this.associatedCustomers = FXCollections.observableArrayList();
         this.id = id;
+        this.title = title;
         this.description = description;
         this.location = location;
         this.type = type;
