@@ -138,6 +138,7 @@ public class GuiController extends Controller {
             ResultSet result = ps.executeQuery();
             while (result.next()) {
                 Customer c = new Customer(
+                        //change these to column names instead of indexes
                   result.getInt(1),
                   result.getString(2),
                   result.getString(3),

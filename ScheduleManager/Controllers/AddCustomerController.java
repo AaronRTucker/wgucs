@@ -8,6 +8,7 @@ package ScheduleManager.Controllers;
 
 import ScheduleManager.DBHelper.JDBC;
 import ScheduleManager.Models.Appointment;
+import ScheduleManager.Models.Country;
 import ScheduleManager.Models.Customer;
 import ScheduleManager.Models.Schedule;
 import javafx.application.Platform;
@@ -31,6 +32,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -45,6 +47,8 @@ public class AddCustomerController extends Controller {
 
     private int nextCustomerId;
 
+    private ArrayList<Country> countries;
+
     //add Customer data fields
     @FXML private Label varField;
     @FXML private TextField CustomerIdField;
@@ -52,6 +56,12 @@ public class AddCustomerController extends Controller {
     @FXML private TextField CustomerAddressField;
     @FXML private TextField CustomerPostalCodeField;
     @FXML private TextField CustomerPhoneNumberField;
+
+    @FXML private ComboBox<String> countryComboBox;
+
+    @FXML private ComboBox<String> divisionComboBox;
+
+    private Country selectedCountry;
 
 
 
@@ -89,7 +99,28 @@ public class AddCustomerController extends Controller {
         CustomerIdField.setEditable(false);
         CustomerIdField.setText(String.valueOf(this.nextCustomerId));
 
+        countryComboBox.setPromptText("Select a country first");
 
+        countries = new ArrayList<>();
+
+
+        //Get country list from database
+        try {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`countries`");
+            ResultSet result = ps.executeQuery();
+            while (result.next()) {
+                Country c = new Country(
+
+                        result.getInt("Country_ID"),
+                        result.getString("Country")
+                );
+                countryComboBox.getItems().addAll(result.getString("Country"));
+                countries.add(c);
+            }
+
+        } catch(SQLException e){
+            System.out.println(e);
+        }
     }
 
 

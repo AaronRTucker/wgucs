@@ -18,5 +18,9 @@
         <TextField fx:id="CustomerPostalCodeField" layoutX="146.0" layoutY="284.0" prefHeight="25.0" prefWidth="77.0" />
         <TextField fx:id="CustomerPhoneNumberField" layoutX="146.0" layoutY="322.0" prefHeight="25.0" prefWidth="77.0" />
         <Button fx:id="modifyCancel2" layoutX="241.0" layoutY="443.0" mnemonicParsing="false" onAction="#addCustomerSavePressed" text="Save" />
+      <ComboBox fx:id="countryComboBox" layoutX="146.0" layoutY="360.0" prefWidth="150.0" />
+      <Label layoutX="55.0" layoutY="364.0" text="Country" />
+      <Label layoutX="55.0" layoutY="403.0" text="State" />
+      <ComboBox fx:id="divisionComboBox" layoutX="146.0" layoutY="399.0" prefWidth="150.0" />
     </children>
 </AnchorPane>
