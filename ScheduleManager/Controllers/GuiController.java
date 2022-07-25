@@ -29,9 +29,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -326,7 +324,21 @@ public class GuiController extends Controller {
             result = a.showAndWait();
             if (result.get() == ButtonType.OK) {
                 schedule.deleteCustomer(selectedCustomer);
-                //CustomersTable.getItems().remove( CustomersTable.getSelectionModel().getSelectedItem() );  //unnecessary, since the view is linked directly to the schedule
+
+                String sql = ("DELETE FROM client_schedule.customers WHERE Customer_ID = " + selectedCustomer.getId() + " ");
+                System.out.println(sql);
+
+                try {
+                    Connection conn = JDBC.connection;
+                    Statement stmt = conn.createStatement();
+                    stmt.executeUpdate(sql);
+                    System.out.println("Deleted records in the table...");
+
+                } catch(SQLException e){
+                    System.out.println(e);
+                }
+
+                //CustomersTable.getItems().remove( CustomersTable.getSelectionModel().getSelectedItem() );  //unnecessary, since the view is linked directly to the database
             }
         }
     }
