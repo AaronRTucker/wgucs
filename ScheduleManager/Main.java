@@ -31,7 +31,7 @@ public class Main extends Application{
         try {
 
             Locale currentLocale = Locale.getDefault();
-            currentLocale = new Locale("fr");
+            //currentLocale = new Locale("fr");         //force language to french
             ResourceBundle bundle = ResourceBundle.getBundle("ScheduleManager.Resources.language", currentLocale);
 
             JDBC.openConnection();

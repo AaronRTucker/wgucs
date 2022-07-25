@@ -35,6 +35,8 @@ public class LoginController implements Initializable {
     private Parent root;
     private ResourceBundle bundle;
 
+    private String userName;
+
 
     /* FXML definitions to link variables from fxml files to the controller*/
     //
@@ -94,11 +96,13 @@ public class LoginController implements Initializable {
         String password;
 
         try {
-            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT Password FROM `client_schedule`.`users` where User_Name = '" + loginNameField.getText() +"';");
+            String userInputName = loginNameField.getText();
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT Password FROM `client_schedule`.`users` where User_Name = '" + userInputName +"';");
             ResultSet result = ps.executeQuery();
             if(result.next()){
                 password = result.getString(1);
                 userFound = true;
+                userName = userInputName;
             } else {
                 password = null;
                 userFound = false;
@@ -141,7 +145,7 @@ public class LoginController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(location), bundle);      //absolute reference for file path of scene
             Schedule schedule = new Schedule();
-            loader.setController(new GuiController(schedule));
+            loader.setController(new GuiController(schedule, userName));
             scene = new Scene((Pane) loader.load(), width, height);                                       //set width and height of scene
             stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(scene);

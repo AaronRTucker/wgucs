@@ -18,7 +18,6 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -83,6 +82,8 @@ public class GuiController extends Controller {
     @FXML private TableColumn<Schedule, Integer> AppointmentCustomerIdCol;
     @FXML private TableColumn<Schedule, Integer> AppointmentUserIdCol;
 
+    private String userName;        //name of the logged-in user
+
 
 
 
@@ -94,7 +95,8 @@ public class GuiController extends Controller {
 
 
     //Constructor for new Controller object
-    public GuiController(Schedule schedule){
+    public GuiController(Schedule schedule, String userName){
+        this.userName = userName;
         this.nextCustomerId = 1;                                                    //set the index of the first Customer and Appointment IDs to be 1
         this.nextAppointmentId = 1;
         this.schedule = schedule;                                             //schedule object passed in from Main
@@ -139,11 +141,12 @@ public class GuiController extends Controller {
             while (result.next()) {
                 Customer c = new Customer(
                         //change these to column names instead of indexes
-                  result.getInt(1),
-                  result.getString(2),
-                  result.getString(3),
-                  result.getString(4),
-                  result.getString(5)
+                  result.getInt("Customer_ID"),
+                  result.getString("Customer_Name"),
+                  result.getString("Address"),
+                  result.getString("Postal_Code"),
+                  result.getString("Phone"),
+                  result.getInt("Division_ID")
                 );
                 if(c.getId() >= nextCustomerId){
                     System.out.println("yes");
@@ -163,15 +166,15 @@ public class GuiController extends Controller {
             ResultSet result = ps.executeQuery();
             while (result.next()) {
                 Appointment a = new Appointment(
-                        result.getInt(1),
-                        result.getString(2),
-                        result.getString(3),
-                        result.getString(4),
-                        result.getString(5),
-                        result.getTimestamp(6),
-                        result.getTimestamp(7),
-                        result.getInt(12),
-                        result.getInt(13)
+                        result.getInt("Appointment_ID"),
+                        result.getString("Title"),
+                        result.getString("Description"),
+                        result.getString("Location"),
+                        result.getString("Type"),
+                        result.getTimestamp("Start"),
+                        result.getTimestamp("End"),
+                        result.getInt("Customer_ID"),
+                        result.getInt("User_ID")
                 );
                 schedule.addAppointment(a);
             }
@@ -265,7 +268,7 @@ public class GuiController extends Controller {
      */
     @FXML
     public void addCustomerButtonPressed(ActionEvent event){
-        AddCustomerController c = new AddCustomerController(nextCustomerId,schedule, this);
+        AddCustomerController c = new AddCustomerController(nextCustomerId,schedule, this, userName);
         loadScene(c, event, "ScheduleManager/Views/addCustomer.fxml", 900, 475);
 
         //ID will be generated and incremented automatically

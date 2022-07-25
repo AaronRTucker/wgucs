@@ -32,7 +32,9 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
+import java.time.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -47,7 +49,8 @@ public class AddCustomerController extends Controller {
 
     private int nextCustomerId;
 
-    private ArrayList<Country> countries;
+    private ArrayList<String> countries;
+    private ArrayList<String> divisions;
 
     //add Customer data fields
     @FXML private Label varField;
@@ -61,16 +64,22 @@ public class AddCustomerController extends Controller {
 
     @FXML private ComboBox<String> divisionComboBox;
 
-    private Country selectedCountry;
+    private String selectedCountry;
+    private int selectedCountryID;
+    private String selectedDivision;
+    private int selectedDivisionID;
+
+    private String userName;    //name to store in database associating which user added this customer
 
 
 
 
 
     //Constructor for new Controller object
-    public AddCustomerController(int nextCustomerId, Schedule schedule, Controller returnController){
+    public AddCustomerController(int nextCustomerId, Schedule schedule, Controller returnController, String userName){
         this.nextCustomerId = nextCustomerId;                                                    //set the index of the first Customer and Appointment IDs to be 1
         this.schedule = schedule;                                             //schedule object passed in from Main
+        this.userName = userName;
         this.returnController = returnController;
 
     }
@@ -95,13 +104,18 @@ public class AddCustomerController extends Controller {
     @Override
     public void initialize( URL url, ResourceBundle resourceBundle) {
 
+        selectedDivisionID = -1;        //used to check if division has been selected before creating customer
+
         bundle = resourceBundle;
         CustomerIdField.setEditable(false);
         CustomerIdField.setText(String.valueOf(this.nextCustomerId));
 
-        countryComboBox.setPromptText("Select a country first");
+        countryComboBox.setPromptText("Select a country");
+
+
 
         countries = new ArrayList<>();
+
 
 
         //Get country list from database
@@ -109,19 +123,83 @@ public class AddCustomerController extends Controller {
             PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`countries`");
             ResultSet result = ps.executeQuery();
             while (result.next()) {
-                Country c = new Country(
-
-                        result.getInt("Country_ID"),
-                        result.getString("Country")
-                );
                 countryComboBox.getItems().addAll(result.getString("Country"));
-                countries.add(c);
+                countries.add(result.getString("Country"));
             }
+
+            divisionComboBox.getItems().addAll("Select a Country first");
 
         } catch(SQLException e){
             System.out.println(e);
         }
     }
+
+
+    /**
+     * Handles country combobox
+     * @param event the action event
+     * @return void
+     */
+    @FXML
+    public void countryBoxPressed(ActionEvent event) {
+        //System.out.println(countryComboBox.getValue());
+        selectedCountry = countryComboBox.getValue();
+        divisions = new ArrayList<>();  //empty out any old values
+        divisionComboBox.getItems().clear();    //empty out any old values
+
+        //Get country ID from selected country name
+        try {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`countries` WHERE Country = '" + selectedCountry + "';");
+            ResultSet result = ps.executeQuery();
+            while (result.next()) {
+                selectedCountryID = result.getInt("Country_ID");
+            }
+
+        } catch(SQLException e){
+            System.out.println(e);
+        }
+
+        //Get division list from database
+        try {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`first_level_divisions` WHERE Country_ID = " + selectedCountryID + ";");
+            ResultSet result = ps.executeQuery();
+
+            while (result.next()) {
+                divisionComboBox.getItems().addAll(result.getString("Division"));
+                divisions.add(result.getString("Division"));
+            }
+
+        } catch(SQLException e){
+            System.out.println(e);
+        }
+
+    }
+
+
+    /**
+     * Handles division combobox
+     * @param event the action event
+     * @return void
+     */
+    @FXML
+    public void divisionBoxPressed(ActionEvent event) {
+        selectedDivision = divisionComboBox.getValue();
+
+        //Get division ID from selected division name
+        try {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`first_level_divisions` WHERE Division = '" + selectedDivision + "';");
+            ResultSet result = ps.executeQuery();
+            while (result.next()) {
+                selectedDivisionID = result.getInt("Division_ID");
+            }
+
+        } catch(SQLException e){
+            System.out.println(e);
+        }
+
+    }
+
+
 
 
     /**
@@ -145,14 +223,25 @@ public class AddCustomerController extends Controller {
                     Alert a = new Alert(Alert.AlertType.ERROR);
                     a.setContentText("Text Fields must not be empty");
                     a.show();
+                } else if(selectedDivisionID == -1){
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setContentText("Please select a state");
+                    a.show();
                 } else {
-                    Customer newCustomer = new Customer(id, name, address, postalCode, phoneNumber);
+
+                    //Not needed, we're going to just refresh from the database rather than store this persistently in the program
+                    //Customer newCustomer = new Customer(id, name, address, postalCode, phoneNumber, selectedDivisionID);
                     //this.schedule.addCustomer(newCustomer);
 
-                    String sql = (
+
+                    Instant instant = Instant.now() ;                           //get the current moment
+                    OffsetDateTime odt = instant.atOffset( ZoneOffset.UTC ) ;   //get the current moment translated to UTC
+                    Timestamp timestamp = Timestamp.valueOf(odt.toLocalDateTime());  //convert the current moment into a legacy format due to database datatype restrictions
+
+                    String sql = (          //create_date uses datetime, last_update uses timestamp.  Only timestamp is aware of timezone information
                             "INSERT INTO `client_schedule`.`customers` " +
-                            "(Customer_ID, Customer_Name, Address, Postal_Code, Phone) " +
-                            "VALUES ("+id+",'"+name+"','"+address+"','"+postalCode+"','"+phoneNumber+"')" );
+                            "(Customer_ID, Customer_Name, Address, Postal_Code, Phone, Create_Date, Created_By, Last_Update, Last_Updated_By,  Division_ID) " +
+                            "VALUES ("+id+",'"+name+"','"+address+"','"+postalCode+"','"+phoneNumber+"','"+timestamp+"','"+userName+"','"+timestamp+"','"+userName+"','"+selectedDivisionID+"')" );
                     System.out.println(sql);
 
                     try {

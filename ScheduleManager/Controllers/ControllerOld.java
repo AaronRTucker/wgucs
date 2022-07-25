@@ -308,12 +308,13 @@ public class ControllerOld implements Initializable {
 
 
 
+
                 if (name.equals("") || address.equals("") || postalCode.equals("") || phoneNumber.equals("")) {
                     Alert a = new Alert(Alert.AlertType.ERROR);
                     a.setContentText("Text Fields must not be empty");
                     a.show();
                 } else {
-                    Customer newCustomer = new Customer(id, name, address, postalCode, phoneNumber);
+                    Customer newCustomer = new Customer(id, name, address, postalCode, phoneNumber, -1);    //don't use this!
                     this.schedule.addCustomer(newCustomer);
                     addCustomerCancelPressed(event);        //return to home screen if there are no errors
                 }
