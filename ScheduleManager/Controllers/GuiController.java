@@ -290,22 +290,15 @@ public class GuiController extends Controller {
     public void modifyCustomerButton(ActionEvent event){
         selectedCustomer = CustomersTable.getSelectionModel().getSelectedItem();
 
+
         Alert a;
         if(selectedCustomer == null){
             a = new Alert(Alert.AlertType.ERROR);
             a.setContentText("Please select a Customer to modify");
             a.show();
         } else {
-            //loadScene( event, "ScheduleManager/Views/modifyCustomer.fxml", 900, 475);
-
-            /*
-            CustomerIdField.setEditable(false);
-            CustomerIdField.setText(String.valueOf(selectedCustomer.getId()));
-            CustomerNameField.setText(selectedCustomer.getName());
-            CustomerAddressField.setText(selectedCustomer.getAddress());
-            CustomerPhoneNumberField.setText(selectedCustomer.getPhoneNumber());
-            CustomerPostalCodeField.setText(selectedCustomer.getPostalCode());
-            */
+            ModifyCustomerController c = new ModifyCustomerController(schedule, this, userName, selectedCustomer);
+            loadScene(c, event, "ScheduleManager/Views/modifyCustomer.fxml", 900, 475);
         }
     }
 
