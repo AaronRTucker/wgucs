@@ -19,6 +19,8 @@ import java.time.ZoneId;
 import java.util.ResourceBundle;
 
 public class LoginController extends Controller {
+    public Button loginExit;
+    public Button loginSubmit;
     private ResourceBundle bundle;
 
     private String userName;

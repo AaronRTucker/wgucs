@@ -3,16 +3,16 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="648.0" prefWidth="508.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
-    <children>
-
-        <Button fx:id="loginExit" layoutX="323.0" layoutY="249.0" mnemonicParsing="false" onAction="#pressExitButton" text="%Exit" />
-        <Label layoutX="126.0" layoutY="122.0" text="%Name" />
-        <Label layoutX="116.0" layoutY="163.0" text="%Password" />
-        <TextField fx:id="loginNameField" layoutX="209.0" layoutY="118.0" />
-        <TextField fx:id="loginPasswordField" layoutX="209.0" layoutY="159.0" />
-        <Button fx:id="loginSubmit" layoutX="256.0" layoutY="249.0" mnemonicParsing="false" onAction="#loginSubmitPressed" text="%Login" />
-      <Label layoutX="123.0" layoutY="207.0" text="%Location" />
-      <TextField fx:id="zoneID" layoutX="209.0" layoutY="203.0" text="%Location" editable="false"/>
-    </children>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="648.0"
+            prefWidth="508.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+    <Button fx:id="loginExit" layoutX="323.0" layoutY="249.0" mnemonicParsing="false" onAction="#pressExitButton"
+            text="%Exit"/>
+    <Label layoutX="126.0" layoutY="122.0" text="%Name"/>
+    <Label layoutX="116.0" layoutY="163.0" text="%Password"/>
+    <TextField fx:id="loginNameField" layoutX="209.0" layoutY="118.0"/>
+    <TextField fx:id="loginPasswordField" layoutX="209.0" layoutY="159.0"/>
+    <Button fx:id="loginSubmit" layoutX="256.0" layoutY="249.0" mnemonicParsing="false" onAction="#loginSubmitPressed"
+            text="%Login"/>
+    <Label layoutX="123.0" layoutY="207.0" text="%Location"/>
+    <TextField fx:id="zoneID" layoutX="209.0" layoutY="203.0" text="%Location" editable="false"/>
 </AnchorPane>
