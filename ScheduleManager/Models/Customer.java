@@ -1,10 +1,6 @@
 package ScheduleManager.Models;
 
 /**
- * Supplied class derived from part class from previous semester
- */
-
-/**
  *
  * @author Aaron Tucker
  */
@@ -12,6 +8,12 @@ public class Customer {
     private int id;
     private String name;
     private String address;
+
+
+
+    private String division;
+
+    private String country;
     private String postalCode;
     private String phoneNumber;
 
@@ -19,13 +21,17 @@ public class Customer {
 
 
 
-    public Customer(int id, String name, String address, String postalCode, String phoneNumber, int division_ID) {
+    public Customer(int id, String name, String address, String postalCode, String division, String country, String phoneNumber, int division_ID) {
         this.id = id;
         this.name = name;
         this.address = address;
+        this.division = division;
+        this.country = country;
         this.phoneNumber = phoneNumber;
         this.postalCode = postalCode;
         this.division_ID = division_ID;
+
+
     }
 
 
@@ -69,6 +75,22 @@ public class Customer {
      */
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getDivision() {
+        return division;
+    }
+
+    public void setDivision(String division) {
+        this.division = division;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     /**

@@ -1,8 +1,3 @@
-
-/**
- * Inventory.java
- */
-
 /**
  *
  * @author Aaron Tucker
@@ -14,8 +9,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class Schedule {
-    private ObservableList<Customer> allCustomers;
-    private ObservableList<Appointment> allAppointments;
+    private final ObservableList<Customer> allCustomers;
+    private final ObservableList<Appointment> allAppointments;
 
 
     public Schedule(){
@@ -42,9 +37,9 @@ public class Schedule {
      * @return the Customer that matches CustomerId
      */
     public Customer lookupCustomer(int CustomerId){
-        for(int i = 0; i < this.allCustomers.size(); i++){
-            if(this.allCustomers.get(i).getId() == CustomerId){
-                return this.allCustomers.get(i);
+        for (Customer allCustomer : this.allCustomers) {
+            if (allCustomer.getId() == CustomerId) {
+                return allCustomer;
             }
         }
         return null;    //no Customer found
@@ -55,9 +50,9 @@ public class Schedule {
      * @return the Appointment that matches AppointmentId
      */
     public Appointment lookupAppointment(int AppointmentId){
-        for(int i = 0; i < this.allAppointments.size(); i++){
-            if(this.allAppointments.get(i).getId() == AppointmentId){
-                return this.allAppointments.get(i);
+        for (Appointment allAppointment : this.allAppointments) {
+            if (allAppointment.getId() == AppointmentId) {
+                return allAppointment;
             }
         }
         return null;    //no Appointment found
@@ -81,30 +76,26 @@ public class Schedule {
 
     /**
      * @param selectedCustomer the Customer to delete
-     * @return true if delete was successful, false otherwise
      */
-    public boolean deleteCustomer(Customer selectedCustomer){
+    public void deleteCustomer(Customer selectedCustomer){
         for(int i = 0; i < allCustomers.size(); i++){
             if(allCustomers.get(i).equals(selectedCustomer)){
                 allCustomers.remove(i);
-                return true;
+                return;
             }
         }
-        return false;
     }
 
     /**
      * @param selectedAppointment the Appointment to delete
-     * @return true if delete was successful, false otherwise
      */
-    public boolean deleteAppointment(Appointment selectedAppointment){
+    public void deleteAppointment(Appointment selectedAppointment){
         for(int i = 0; i < allAppointments.size(); i++){
             if(allAppointments.get(i).equals(selectedAppointment)){
                 allAppointments.remove(i);
-                return true;
+                return;
             }
         }
-        return false;
     }
 
     /**

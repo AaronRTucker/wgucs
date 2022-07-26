@@ -6,6 +6,7 @@
 
 package ScheduleManager.Controllers;
 
+import ScheduleManager.DBHelper.DatabaseQueryHelper;
 import ScheduleManager.DBHelper.JDBC;
 import ScheduleManager.Models.Customer;
 import ScheduleManager.Models.Schedule;
@@ -33,17 +34,8 @@ import java.util.ResourceBundle;
 
 public class ModifyCustomerController extends Controller {
 
-    private Stage stage;
+    ResourceBundle bundle;
 
-    private ResourceBundle bundle;
-    private Scene scene;
-    private Parent root;
-    private final Schedule schedule;
-
-    private int nextCustomerId;
-
-    private ArrayList<String> countries;
-    private ArrayList<String> divisions;
 
     //add Customer data fields
     @FXML private Label varField;
@@ -62,21 +54,18 @@ public class ModifyCustomerController extends Controller {
     private String selectedDivision;
     private int selectedDivisionID;
 
-    private String userName;    //name to store in database associating which user added this customer
+    private final String userName;    //name to store in database associating which user added this customer
 
-    private Customer selectedCustomer;
+    private final Customer selectedCustomer;
 
 
 
 
 
     //Constructor for new Controller object
-    public ModifyCustomerController(Schedule schedule, Controller returnController, String userName, Customer selectedCustomer){
+    public ModifyCustomerController(String userName, Customer selectedCustomer){
         this.selectedCustomer = selectedCustomer;
-        this.schedule = schedule;                                             //schedule object passed in from Main
         this.userName = userName;
-        this.returnController = returnController;
-
     }
 
 
@@ -90,14 +79,12 @@ public class ModifyCustomerController extends Controller {
 
     /**
      * Called every time a screen is loaded
-     * @futureenhancement add more search fields to find specific quantities
-     * @runtimeerror discovered that file paths to fxml scenes need to be absolute instead of relative to work
      * @param url the url
      * @param resourceBundle the resource bundle
-     * @return void
      */
     @Override
     public void initialize( URL url, ResourceBundle resourceBundle) {
+        bundle = resourceBundle;
 
         CustomerIdField.setText(String.valueOf(selectedCustomer.getId()));
         CustomerNameField.setText(selectedCustomer.getName());
@@ -106,89 +93,51 @@ public class ModifyCustomerController extends Controller {
         CustomerPostalCodeField.setText(selectedCustomer.getPostalCode());
         selectedDivisionID = selectedCustomer.getDivision_ID();
 
-        //get division name and country ID from database
-        try {
-            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`first_level_divisions` WHERE Division_ID = " + selectedDivisionID + ";");
-            ResultSet result = ps.executeQuery();
-            while (result.next()) {
-                selectedDivision = result.getString("Division");
-                selectedCountryID = result.getInt("Country_ID");
-            }
 
-        } catch(SQLException e){
-            System.out.println(e);
-        }
+        //get division name and country ID from database
+        selectedDivision = DatabaseQueryHelper.getDivisionName(selectedDivisionID);
+        selectedCountryID = DatabaseQueryHelper.getCountryIDFromDivisionID(selectedDivisionID);
+
 
         //get country name from database
-        try {
-            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`countries` WHERE Country_ID = " + selectedCountryID + ";");
-            ResultSet result = ps.executeQuery();
-            while (result.next()) {
-                selectedCountry = result.getString("Country");
-            }
-
-        } catch(SQLException e){
-            System.out.println(e);
-        }
+        selectedCountry = DatabaseQueryHelper.getCountryName(selectedDivisionID);
 
 
         countryComboBox.setPromptText(selectedCountry);
         divisionComboBox.setPromptText(selectedDivision);
 
 
-        bundle = resourceBundle;
         CustomerIdField.setEditable(false);
         CustomerIdField.setText(String.valueOf(selectedCustomer.getId()));
 
 
-        countries = new ArrayList<>();
-
-
-
         //Get country list from database
-        try {
-            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`countries`");
-            ResultSet result = ps.executeQuery();
-            while (result.next()) {
-                countryComboBox.getItems().addAll(result.getString("Country"));
-                countries.add(result.getString("Country"));
-            }
+        ArrayList<String> countries = DatabaseQueryHelper.getCountries();
 
-            divisionComboBox.getItems().addAll("Select a Country first");
-
-        } catch(SQLException e){
-            System.out.println(e);
+        //populate the countries combo box
+        for (String country : countries) {
+            countryComboBox.getItems().addAll(country);
         }
 
 
-        divisions = new ArrayList<>();  //empty out any old values
-        divisionComboBox.getItems().clear();    //empty out any old values
-        //Get division list from database
-        try {
-            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`first_level_divisions` WHERE Country_ID = " + selectedCountryID + ";");
-            ResultSet result = ps.executeQuery();
+        //Get divisions for the selected country from the database
+        ArrayList<String> divisions = DatabaseQueryHelper.getDivisions(selectedCountryID);
 
-            while (result.next()) {
-                divisionComboBox.getItems().addAll(result.getString("Division"));
-                divisions.add(result.getString("Division"));
-            }
-
-        } catch(SQLException e){
-            System.out.println(e);
+        //populate the division combo box
+        for (String division : divisions) {
+            divisionComboBox.getItems().addAll(division);
         }
     }
+
 
 
     /**
      * Handles country combobox
      * @param event the action event
-     * @return void
      */
     @FXML
     public void countryBoxPressed(ActionEvent event) {
-        //System.out.println(countryComboBox.getValue());
         selectedCountry = countryComboBox.getValue();
-        divisions = new ArrayList<>();  //empty out any old values
         divisionComboBox.getItems().clear();    //empty out any old values
 
         //once country is changed, division can't be kept valid
@@ -196,29 +145,14 @@ public class ModifyCustomerController extends Controller {
         divisionComboBox.setPromptText("Select a division");
 
         //Get country ID from selected country name
-        try {
-            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`countries` WHERE Country = '" + selectedCountry + "';");
-            ResultSet result = ps.executeQuery();
-            while (result.next()) {
-                selectedCountryID = result.getInt("Country_ID");
-            }
+        selectedCountryID = DatabaseQueryHelper.getCountryID(selectedCountry);
 
-        } catch(SQLException e){
-            System.out.println(e);
-        }
+        //Get divisions for the selected country from the database
+        ArrayList<String> divisions = DatabaseQueryHelper.getDivisions(selectedCountryID);
 
-        //Get division list from database
-        try {
-            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`first_level_divisions` WHERE Country_ID = " + selectedCountryID + ";");
-            ResultSet result = ps.executeQuery();
-
-            while (result.next()) {
-                divisionComboBox.getItems().addAll(result.getString("Division"));
-                divisions.add(result.getString("Division"));
-            }
-
-        } catch(SQLException e){
-            System.out.println(e);
+        //populate the division combo box
+        for (String division : divisions) {
+            divisionComboBox.getItems().addAll(division);
         }
 
     }
@@ -227,23 +161,13 @@ public class ModifyCustomerController extends Controller {
     /**
      * Handles division combobox
      * @param event the action event
-     * @return void
      */
     @FXML
     public void divisionBoxPressed(ActionEvent event) {
         selectedDivision = divisionComboBox.getValue();
 
         //Get division ID from selected division name
-        try {
-            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`first_level_divisions` WHERE Division = '" + selectedDivision + "';");
-            ResultSet result = ps.executeQuery();
-            while (result.next()) {
-                selectedDivisionID = result.getInt("Division_ID");
-            }
-
-        } catch(SQLException e){
-            System.out.println(e);
-        }
+        selectedDivisionID = DatabaseQueryHelper.getDivisionID(selectedDivision);
 
     }
 
@@ -253,7 +177,6 @@ public class ModifyCustomerController extends Controller {
     /**
      * Handles saving Customers
      * @param event the action event
-     * @return void
      */
     @FXML
     public void modifyCustomerSavePressed(ActionEvent event){
@@ -265,7 +188,6 @@ public class ModifyCustomerController extends Controller {
                 String phoneNumber = CustomerPhoneNumberField.getText();
 
 
-
                 if (name.equals("") || address.equals("") || postalCode.equals("") || phoneNumber.equals("")) {
                     Alert a = new Alert(Alert.AlertType.ERROR);
                     a.setContentText("Text Fields must not be empty");
@@ -275,38 +197,9 @@ public class ModifyCustomerController extends Controller {
                     a.setContentText("Please select a state");
                     a.show();
                 } else {
+                    //Input is good
 
-                    //Not needed, we're going to just refresh from the database rather than store this persistently in the program
-                    //Customer newCustomer = new Customer(id, name, address, postalCode, phoneNumber, selectedDivisionID);
-                    //this.schedule.addCustomer(newCustomer);
-
-
-                    Instant instant = Instant.now() ;                           //get the current moment
-                    OffsetDateTime odt = instant.atOffset( ZoneOffset.UTC ) ;   //get the current moment translated to UTC
-                    Timestamp timestamp = Timestamp.valueOf(odt.toLocalDateTime());  //convert the current moment into a legacy format due to database datatype restrictions
-
-
-                    String sql = ("UPDATE client_schedule.customers SET " +
-                            "Customer_Name='"+name+"', " +
-                            "Address='"+address+"', " +
-                            "Postal_Code='"+postalCode+"', " +
-                            "Phone = '"+phoneNumber+"', " +
-                            "Created_By = '"+userName+"', " +
-                            "Last_Update = '"+timestamp+"', " +
-                            "Last_Updated_By = '"+userName+"'," +
-                            "Division_ID = "+selectedDivisionID+" " +
-                            "WHERE Customer_ID = " + id + " ");
-                    System.out.println(sql);
-
-                    try {
-                        Connection conn = JDBC.connection;
-                        Statement stmt = conn.createStatement();
-                        stmt.executeUpdate(sql);
-                        System.out.println("Modified records in the table...");
-
-                    } catch(SQLException e){
-                        System.out.println(e);
-                    }
+                    DatabaseQueryHelper.modifyCustomer(id, name, address, postalCode, phoneNumber, userName, selectedDivisionID);
 
                     modifyCustomerCancelPressed(event);        //return to home screen if there are no errors
                 }
@@ -321,38 +214,12 @@ public class ModifyCustomerController extends Controller {
     /**
      * Handles cancelling out of modify Customer screen
      * @param event the action event
-     * @throws IOException
-     * @return void
      */
     @FXML
-    public void modifyCustomerCancelPressed(ActionEvent event) throws IOException{
-        this.loadScene(event, "ScheduleManager/Views/gui.fxml", 900, 475);
+    public void modifyCustomerCancelPressed(ActionEvent event) {
+        Controller c = new GuiController(userName);
+        loadScene(c, event, "ScheduleManager/Views/gui.fxml", 900, 475, bundle);
     }
 
 
-
-
-    /**
-     * Loads a new scene with a given file, width, and height
-     * @param event the action event
-     * @param location the location of the scene file
-     * @param width the width of the scene
-     * @param height the height of the scene
-     * @return void
-     * @RUNTIME ERROR
-     */
-    //Private helper function
-    //Handle switching between fxml file scenes
-    private void loadScene(ActionEvent event, String location, int width, int height){
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(location), bundle);      //absolute reference for file path of scene
-            loader.setController(returnController);
-            scene = new Scene((Pane) loader.load(), width, height);                                       //set width and height of scene
-            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException exception){
-            System.out.println(exception);
-        }
-    }
 }

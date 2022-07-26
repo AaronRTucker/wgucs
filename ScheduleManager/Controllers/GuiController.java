@@ -7,48 +7,36 @@
 package ScheduleManager.Controllers;
 
 import ScheduleManager.DBHelper.JDBC;
+import ScheduleManager.DBHelper.DatabaseQueryHelper;
 import ScheduleManager.Models.Appointment;
 import ScheduleManager.Models.Customer;
 import ScheduleManager.Models.Schedule;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
-import java.sql.*;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class GuiController extends Controller {
 
-    private Stage stage;
-
     private ResourceBundle bundle;
-    private Scene scene;
-    private Parent root;
-    private Schedule schedule;
+    private final Schedule schedule;
 
     private int nextCustomerId;
-    private int nextAppointmentId;
     private Customer selectedCustomer;
     private Appointment selectedAppointment;
 
     //maintain list of temporary associated Customers
-    private ObservableList<Customer> temporaryAssociatedCustomers;
 
 
     //filtered Customers and Appointments list used in searches
@@ -66,6 +54,10 @@ public class GuiController extends Controller {
     @FXML private TableColumn<Customer, Integer> CustomerIdCol;
     @FXML private TableColumn<Customer, String> CustomerNameCol;
     @FXML private TableColumn<Customer, String> CustomerAddressCol;
+
+    @FXML private TableColumn<Customer, String> CustomerDivisionCol;
+
+    @FXML private TableColumn<Customer, String> CustomerCountryCol;
     @FXML private TableColumn<Customer, String> CustomerPostalCodeCol;
     @FXML private TableColumn<Customer, String> CustomerPhoneNumberCol;
 
@@ -80,7 +72,17 @@ public class GuiController extends Controller {
     @FXML private TableColumn<Schedule, Integer> AppointmentCustomerIdCol;
     @FXML private TableColumn<Schedule, Integer> AppointmentUserIdCol;
 
-    private String userName;        //name of the logged-in user
+    @FXML private Button exitBtn;
+    @FXML private Button addCustomerBtn;
+    @FXML private Button addAppointmentBtn;
+    @FXML private Button modCustomerBtn;
+    @FXML private Button delCustomerBtn;
+    @FXML private Button delAppointmentBtn;
+    @FXML private Button modAppointmentBtn;
+
+
+
+    private final String userName;        //name of the logged-in user
 
 
 
@@ -93,12 +95,10 @@ public class GuiController extends Controller {
 
 
     //Constructor for new Controller object
-    public GuiController(Schedule schedule, String userName){
+    public GuiController(String userName){
         this.userName = userName;
-        this.nextCustomerId = 1;                                                    //set the index of the first Customer and Appointment IDs to be 1
-        this.nextAppointmentId = 1;
-        this.schedule = schedule;                                             //schedule object passed in from Main
-        this.temporaryAssociatedCustomers = FXCollections.observableArrayList();    //initialize the temporary Customers arraylist
+        this.nextCustomerId = 1;
+        this.schedule = new Schedule();                                             //schedule object passed in from Main
 
     }
 
@@ -113,18 +113,13 @@ public class GuiController extends Controller {
 
     /**
      * Called every time a screen is loaded
-     * @futureenhancement add more search fields to find specific quantities
-     * @runtimeerror discovered that file paths to fxml scenes need to be absolute instead of relative to work
      * @param url the url
      * @param resourceBundle the resource bundle
-     * @return void
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         bundle = resourceBundle;
-
-        schedule= new Schedule();   //start fresh with a new schedule and query the database each time returning to home screen
 
 
         //Change default table placeholder messages
@@ -132,63 +127,24 @@ public class GuiController extends Controller {
         AppointmentsTable.setPlaceholder(new Label("Appointments list is empty"));
 
         //Get customer table data from MYSQL database
+        DatabaseQueryHelper.getAllCustomers(schedule);
 
-        try {
-            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`customers`");
-            ResultSet result = ps.executeQuery();
-            while (result.next()) {
-                Customer c = new Customer(
-                        //change these to column names instead of indexes
-                  result.getInt("Customer_ID"),
-                  result.getString("Customer_Name"),
-                  result.getString("Address"),
-                  result.getString("Postal_Code"),
-                  result.getString("Phone"),
-                  result.getInt("Division_ID")
-                );
-                if(c.getId() >= nextCustomerId){
-                    System.out.println("yes");
-                    nextCustomerId = c.getId()+1;
-                }
-                schedule.addCustomer(c);
-            }
+        //Get the next customer ID to use when creating a new customer
+        nextCustomerId = DatabaseQueryHelper.getNextCustomerId(schedule);
 
-            } catch(SQLException e){
-                System.out.println(e);
-        }
 
         //Get appointment table data from MYSQL database
-
-        try {
-            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`appointments`");
-            ResultSet result = ps.executeQuery();
-            while (result.next()) {
-                Appointment a = new Appointment(
-                        result.getInt("Appointment_ID"),
-                        result.getString("Title"),
-                        result.getString("Description"),
-                        result.getString("Location"),
-                        result.getString("Type"),
-                        result.getTimestamp("Start"),
-                        result.getTimestamp("End"),
-                        result.getInt("Customer_ID"),
-                        result.getInt("User_ID")
-                );
-                schedule.addAppointment(a);
-            }
-
-        } catch(SQLException e){
-            System.out.println(e);
-        }
-
+        DatabaseQueryHelper.getAllAppointments(schedule);
 
 
         //populate the table with Customers data from the schedule
-        CustomerIdCol.setCellValueFactory(new PropertyValueFactory<Customer, Integer>("id"));
-        CustomerNameCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("name"));
-        CustomerAddressCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("address"));
-        CustomerPostalCodeCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("postalCode"));
-        CustomerPhoneNumberCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("phoneNumber"));
+        CustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        CustomerNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        CustomerAddressCol.setCellValueFactory(new PropertyValueFactory<>("address"));
+        CustomerDivisionCol.setCellValueFactory(new PropertyValueFactory<>("division"));
+        CustomerCountryCol.setCellValueFactory(new PropertyValueFactory<>("country"));
+        CustomerPostalCodeCol.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
+        CustomerPhoneNumberCol.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
         CustomersTable.setItems(schedule.getAllCustomers());
 
         //populate the table with Appointments data from the schedule
@@ -207,18 +163,15 @@ public class GuiController extends Controller {
 
         //Set up anonymous callback function for the event listener on the Customers search field
         filteredCustomers = new FilteredList<>(schedule.getAllCustomers(), p -> true);
-        CustomerSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredCustomers.setPredicate(Customer -> {
-                if (newValue == null || newValue.isEmpty()) {
-                    return true;
-                }
-                String lowerCaseFilter = newValue.toLowerCase();
-                if (Customer.getName().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Customer.getId()))) {    //if search text equals Customer ID or name
-                    return true; // Filter matches name or ID.
-                }
-                return false; // Doesn't match
-            });
-        });
+        CustomerSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> filteredCustomers.setPredicate(Customer -> {
+            if (newValue == null || newValue.isEmpty()) {
+                return true;
+            }
+            String lowerCaseFilter = newValue.toLowerCase();
+            //if search text equals Customer ID or name
+            return Customer.getName().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Customer.getId())); // Filter matches name or ID.
+// Doesn't match
+        }));
         SortedList<Customer> sortedCustomersData = new SortedList<>(filteredCustomers);
         sortedCustomersData.comparatorProperty().bind(CustomersTable.comparatorProperty());
         CustomersTable.setItems(sortedCustomersData);
@@ -226,19 +179,17 @@ public class GuiController extends Controller {
 
         //Set up anonymous callback function for the event listener on the Appointments search field
         filteredAppointments = new FilteredList<>(schedule.getAllAppointments(), p -> true);
-        AppointmentSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredAppointments.setPredicate(Appointment -> {
-                if (newValue == null || newValue.isEmpty()) {
-                    return true;
-                }
-                String lowerCaseFilter = newValue.toLowerCase();
+        AppointmentSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> filteredAppointments.setPredicate(Appointment -> {
+            if (newValue == null || newValue.isEmpty()) {
+                return true;
+            }
+            String lowerCaseFilter = newValue.toLowerCase();
 
-                if (Appointment.getTitle().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Appointment.getId()))) {//if search text equals Appointment ID or name
-                    return true; // Filter matches title or ID.
-                }
-                return false; // Filter doesn't match.
-            });
-        });
+            //if search text equals Appointment ID or name
+            return Appointment.getTitle().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Appointment.getId())); // Filter matches title or ID.
+// Filter doesn't match.
+        }));
+
         SortedList<Appointment> sortedAppointmentsData = new SortedList<>(filteredAppointments);
         sortedAppointmentsData.comparatorProperty().bind(AppointmentsTable.comparatorProperty());
         AppointmentsTable.setItems(sortedAppointmentsData);
@@ -249,7 +200,6 @@ public class GuiController extends Controller {
     /**
      * Handle exiting the application
      * @param event the action event
-     * @return void
      */
     @FXML
     public void pressExitButton(ActionEvent event){
@@ -262,17 +212,11 @@ public class GuiController extends Controller {
     /**
      * Handles adding Customer
      * @param event the action event
-     * @return void
      */
     @FXML
     public void addCustomerButtonPressed(ActionEvent event){
-        AddCustomerController c = new AddCustomerController(nextCustomerId,schedule, this, userName);
-        loadScene(c, event, "ScheduleManager/Views/addCustomer.fxml", 900, 475);
-
-        //ID will be generated and incremented automatically
-        //this code has to be run after the stage has been swapped, if run before it will throw a null error
-        //CustomerIdField.setEditable(false);
-        //CustomerIdField.setText(String.valueOf(this.nextCustomerId));
+        AddCustomerController c = new AddCustomerController(nextCustomerId, userName);
+        loadScene(c, event, "ScheduleManager/Views/addCustomer.fxml", 900, 475, bundle);
 
     }
 
@@ -282,7 +226,6 @@ public class GuiController extends Controller {
     /**
      * Handles modifying Customers
      * @param event the action event
-     * @return void
      */
     @FXML
     public void modifyCustomerButton(ActionEvent event){
@@ -295,15 +238,14 @@ public class GuiController extends Controller {
             a.setContentText("Please select a Customer to modify");
             a.show();
         } else {
-            ModifyCustomerController c = new ModifyCustomerController(schedule, this, userName, selectedCustomer);
-            loadScene(c, event, "ScheduleManager/Views/modifyCustomer.fxml", 900, 475);
+            ModifyCustomerController c = new ModifyCustomerController(userName, selectedCustomer);
+            loadScene(c, event, "ScheduleManager/Views/modifyCustomer.fxml", 900, 475, bundle);
         }
     }
 
     /**
      * Handles deleting Customers
      * @param event the action event
-     * @return void
      */
     @FXML
     public void deleteCustomerButton(ActionEvent event)
@@ -322,23 +264,10 @@ public class GuiController extends Controller {
             a.setHeaderText("You are about to delete Customer: " + selectedCustomer.getName());
             a.setContentText("Are you sure you want to do this?");
             result = a.showAndWait();
-            if (result.get() == ButtonType.OK) {
-                schedule.deleteCustomer(selectedCustomer);
-
-                String sql = ("DELETE FROM client_schedule.customers WHERE Customer_ID = " + selectedCustomer.getId() + " ");
-                System.out.println(sql);
-
-                try {
-                    Connection conn = JDBC.connection;
-                    Statement stmt = conn.createStatement();
-                    stmt.executeUpdate(sql);
-                    System.out.println("Deleted records in the table...");
-
-                } catch(SQLException e){
-                    System.out.println(e);
+            if(result.isPresent()) {
+                if (result.get() == ButtonType.OK) {
+                    DatabaseQueryHelper.deleteCustomer(schedule, selectedCustomer);//delete the customer from the database
                 }
-
-                //CustomersTable.getItems().remove( CustomersTable.getSelectionModel().getSelectedItem() );  //unnecessary, since the view is linked directly to the database
             }
         }
     }
@@ -347,7 +276,6 @@ public class GuiController extends Controller {
     /**
      * Handles adding Appointments
      * @param event the action event
-     * @return void
      */
     @FXML
     public void addAppointmentButtonPressed(ActionEvent event){
@@ -362,7 +290,6 @@ public class GuiController extends Controller {
     /**
      * Handles modifying Appointments
      * @param event the action event
-     * @return void
      */
     @FXML
     public void modifyAppointmentButton(ActionEvent event){
@@ -373,7 +300,7 @@ public class GuiController extends Controller {
             a.setContentText("Please select a Appointment to modify");
             a.show();
         } else {
-            temporaryAssociatedCustomers = selectedAppointment.getAllAssociatedCustomers();
+            //temporaryAssociatedCustomers = selectedAppointment.getAllAssociatedCustomers();
             //loadScene(this.event, "ScheduleManager/Views/modifyAppointment.fxml", 900, 675);
 
             //ID will be generated and incremented automatically
@@ -398,7 +325,6 @@ public class GuiController extends Controller {
     /**
      * Handles deleting Appointments
      * @param event the action event
-     * @return void
      */
     @FXML
     public void deleteAppointmentButton(ActionEvent event)
@@ -422,8 +348,10 @@ public class GuiController extends Controller {
             a.setHeaderText("You are about to delete Appointment: " + selectedAppointment.getTitle());
             a.setContentText("Are you sure you want to do this?");
             result = a.showAndWait();
-            if (result.get() == ButtonType.OK) {
-                schedule.deleteAppointment(selectedAppointment);
+            if(result.isPresent()){
+                if (result.get() == ButtonType.OK) {
+                    schedule.deleteAppointment(selectedAppointment);
+                }
             }
         }
     }
@@ -433,10 +361,9 @@ public class GuiController extends Controller {
     /**
      * Handles the Customer search error messages
      * @param event the action event
-     * @return void
      */
     @FXML
-    //Handle showing the error messages for no Customer search results and empty Customers data table
+    //Handle showing the error messages for no Customer search results and empty Customer data table
     public void CustomerSearchKeyTyped(KeyEvent event){
         if(!CustomerSearchTextField.getText().isEmpty()){   //if there is something typed in the search box
             if(filteredCustomers.size() == 0){              //and there are no results
@@ -450,7 +377,6 @@ public class GuiController extends Controller {
     /**
      * Handles the Appointment search error messages
      * @param event the action event
-     * @return void
      */
     @FXML
     //Handle showing the error messages for no Appointment search results and empty Appointment data table
@@ -461,31 +387,6 @@ public class GuiController extends Controller {
             }
         } else {
             AppointmentsTable.setPlaceholder(new Label("Appointments list is empty"));
-        }
-    }
-
-
-    /**
-     * Loads a new scene with a given file, width, and height
-     * @param event the action event
-     * @param location the location of the scene file
-     * @param width the width of the scene
-     * @param height the height of the scene
-     * @return void
-     * @RUNTIME ERROR
-     */
-    //Private helper function
-    //Handle switching between fxml file scenes
-    private void loadScene(Controller c, ActionEvent event, String location, int width, int height){
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(location), bundle);      //absolute reference for file path of scene
-            loader.setController(c);
-            scene = new Scene((Pane) loader.load(), width, height);                                       //set width and height of scene
-            stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException exception){
-            System.out.println(exception);
         }
     }
 }
