@@ -59,7 +59,6 @@ public abstract class DatabaseQueryHelper {
             while (result.next()) {
                 int temp = result.getInt("Customer_ID");
                 if (temp >= nextCustomerId) {
-                    System.out.println("yes");
                     nextCustomerId = temp + 1;
                 }
             }
@@ -67,6 +66,25 @@ public abstract class DatabaseQueryHelper {
             e.printStackTrace();
         }
         return nextCustomerId;
+    }
+
+    //Get the next customer ID by looking for the highest current ID in the database
+    public static int getNextAppointmentId(Schedule schedule){
+        int nextAppointmentId = -1;
+
+        try {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`appointments`");
+            ResultSet result = ps.executeQuery();
+            while (result.next()) {
+                int temp = result.getInt("Appointment_ID");
+                if (temp >= nextAppointmentId) {
+                    nextAppointmentId = temp + 1;
+                }
+            }
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return nextAppointmentId;
     }
 
 
@@ -200,6 +218,22 @@ public abstract class DatabaseQueryHelper {
         return -1;
     }
 
+    public static int getContactID(String contactName){
+        //Get country ID from selected country name
+        try {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`contacts` WHERE Contact_Name = '" + contactName + "';");
+            ResultSet result = ps.executeQuery();
+            if (result.next()) {
+                return result.getInt("Contact_ID");
+            }
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
 
     public static ArrayList<String> getDivisions(int countryID){
         ArrayList<String> divisions = new ArrayList<>();
@@ -235,6 +269,57 @@ public abstract class DatabaseQueryHelper {
         return countries;
     }
 
+    public static ArrayList<String> getContacts(){
+        ArrayList<String> contacts = new ArrayList<>();
+        //Get contact list from database
+        try {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`contacts`");
+            ResultSet result = ps.executeQuery();
+            while (result.next()) {
+                contacts.add(result.getString("Contact_Name"));
+            }
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        return contacts;
+    }
+
+    public static ArrayList<Integer> getUserIDs(){
+        ArrayList<Integer> userIDs = new ArrayList<>();
+        //Get contact list from database
+        try {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`users`");
+            ResultSet result = ps.executeQuery();
+            while (result.next()) {
+                userIDs.add(result.getInt("User_ID"));
+            }
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        return userIDs;
+    }
+
+    public static ArrayList<Integer> getCustomerIDs(){
+        ArrayList<Integer> customerIDs = new ArrayList<>();
+        //Get contact list from database
+        try {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`customers`");
+            ResultSet result = ps.executeQuery();
+            while (result.next()) {
+                customerIDs.add(result.getInt("Customer_ID"));
+            }
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        return customerIDs;
+    }
+
     public static void addCustomer(int id,String name,String address,String postalCode,String phoneNumber,String userName,int selectedDivisionID){
         Instant instant = Instant.now() ;                           //get the current moment
         OffsetDateTime odt = instant.atOffset( ZoneOffset.UTC ) ;   //get the current moment translated to UTC
@@ -244,6 +329,29 @@ public abstract class DatabaseQueryHelper {
                 "INSERT INTO `client_schedule`.`customers` " +
                         "(Customer_ID, Customer_Name, Address, Postal_Code, Phone, Create_Date, Created_By, Last_Update, Last_Updated_By,  Division_ID) " +
                         "VALUES ("+id+",'"+name+"','"+address+"','"+postalCode+"','"+phoneNumber+"','"+timestamp+"','"+userName+"','"+timestamp+"','"+userName+"','"+selectedDivisionID+"')" );
+        System.out.println(sql);
+
+        try {
+            Connection conn = JDBC.connection;
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+            System.out.println("Inserted records into the table...");
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    //DatabaseQueryHelper.addAppointment(id, title, description, location, selectedContactId, type, startDateSelect, endDateSelect, selectedUserID, selectedCustomerID);
+    public static void addAppointment(int id, String title,String description,String location, int contactId, String type, Timestamp start, Timestamp end, int userID, int customerID, String userName){
+        Instant instant = Instant.now() ;                           //get the current moment
+        OffsetDateTime odt = instant.atOffset( ZoneOffset.UTC ) ;   //get the current moment translated to UTC
+        Timestamp timestamp = Timestamp.valueOf(odt.toLocalDateTime());  //convert the current moment into a legacy format due to database datatype restrictions
+
+        String sql = (          //create_date uses datetime, last_update uses timestamp.  Only timestamp is aware of timezone information
+                "INSERT INTO `client_schedule`.`appointments` " +
+                        "(Appointment_ID, Title, Description, Location, Type, Start, End, Create_Date, Created_By, Last_Update, Last_Updated_By, Customer_ID, User_ID, Contact_ID) " +
+                        "VALUES ("+id+",'"+title+"','"+description+"','"+location+"','"+type+"','"+start+"','"+end+"','"+timestamp+"','"+userName+"','"+timestamp+"','"+userName+"','"+customerID+"','"+userID+"','"+contactId+"')" );
         System.out.println(sql);
 
         try {

@@ -30,6 +30,7 @@ public class GuiController extends Controller {
     private final Schedule schedule;
 
     private int nextCustomerId;
+    private int nextAppointmentId;
     private Customer selectedCustomer;
     private Appointment selectedAppointment;
 
@@ -126,71 +127,26 @@ public class GuiController extends Controller {
         //Get customer table data from MYSQL database
         DatabaseQueryHelper.getAllCustomers(schedule);
 
-        //Get the next customer ID to use when creating a new customer
-        nextCustomerId = DatabaseQueryHelper.getNextCustomerId(schedule);
-
-
         //Get appointment table data from MYSQL database
         DatabaseQueryHelper.getAllAppointments(schedule);
 
+        //Get the next customer ID to use when creating a new customer
+        nextCustomerId = DatabaseQueryHelper.getNextCustomerId(schedule);
+
+        //Get the next appointment ID to use when creating a new appointment
+        nextAppointmentId = DatabaseQueryHelper.getNextAppointmentId(schedule);
 
         //populate the table with Customers data from the schedule
-        CustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-        CustomerNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        CustomerAddressCol.setCellValueFactory(new PropertyValueFactory<>("address"));
-        CustomerDivisionCol.setCellValueFactory(new PropertyValueFactory<>("division"));
-        CustomerCountryCol.setCellValueFactory(new PropertyValueFactory<>("country"));
-        CustomerPostalCodeCol.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
-        CustomerPhoneNumberCol.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
-        CustomersTable.setItems(schedule.getAllCustomers());
+        populateCustomerTable();
 
         //populate the table with Appointments data from the schedule
-        AppointmentIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-        AppointmentTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
-        AppointmentDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
-        AppointmentLocationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
-        AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-        AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<>("start"));
-        AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<>("end"));
-        AppointmentCustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
-        AppointmentUserIdCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
+        populateAppointmentsTable();
 
-        AppointmentsTable.setItems(schedule.getAllAppointments());
+        //Set up customer search callback function
+        setupCustomerTableSearch();
 
-
-        //Set up anonymous callback function for the event listener on the Customers search field
-        filteredCustomers = new FilteredList<>(schedule.getAllCustomers(), p -> true);
-        CustomerSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> filteredCustomers.setPredicate(Customer -> {
-            if (newValue == null || newValue.isEmpty()) {
-                return true;
-            }
-            String lowerCaseFilter = newValue.toLowerCase();
-            //if search text equals Customer ID or name
-            return Customer.getName().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Customer.getId())); // Filter matches name or ID.
-// Doesn't match
-        }));
-        SortedList<Customer> sortedCustomersData = new SortedList<>(filteredCustomers);
-        sortedCustomersData.comparatorProperty().bind(CustomersTable.comparatorProperty());
-        CustomersTable.setItems(sortedCustomersData);
-
-
-        //Set up anonymous callback function for the event listener on the Appointments search field
-        filteredAppointments = new FilteredList<>(schedule.getAllAppointments(), p -> true);
-        AppointmentSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> filteredAppointments.setPredicate(Appointment -> {
-            if (newValue == null || newValue.isEmpty()) {
-                return true;
-            }
-            String lowerCaseFilter = newValue.toLowerCase();
-
-            //if search text equals Appointment ID or name
-            return Appointment.getTitle().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Appointment.getId())); // Filter matches title or ID.
-// Filter doesn't match.
-        }));
-
-        SortedList<Appointment> sortedAppointmentsData = new SortedList<>(filteredAppointments);
-        sortedAppointmentsData.comparatorProperty().bind(AppointmentsTable.comparatorProperty());
-        AppointmentsTable.setItems(sortedAppointmentsData);
-
+        //Set up appointment search callback function
+        setupAppointmentTableSearch();
 
     }
 
@@ -276,7 +232,8 @@ public class GuiController extends Controller {
      */
     @FXML
     public void addAppointmentButtonPressed(ActionEvent event){
-        //loadScene(event, "ScheduleManager/Views/addAppointment.fxml", 900, 675 );
+        AddAppointmentController c = new AddAppointmentController(nextAppointmentId, userName);
+        loadScene(c, event, "ScheduleManager/Views/addAppointment.fxml", 900, 675, bundle );
 
         //ID will be generated and incremented automatically
         //this code has to be run after the stage has been swapped, if run before it will throw a null error
@@ -385,5 +342,66 @@ public class GuiController extends Controller {
         } else {
             AppointmentsTable.setPlaceholder(new Label("Appointments list is empty"));
         }
+    }
+
+
+    private void populateCustomerTable(){
+        CustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        CustomerNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        CustomerAddressCol.setCellValueFactory(new PropertyValueFactory<>("address"));
+        CustomerDivisionCol.setCellValueFactory(new PropertyValueFactory<>("division"));
+        CustomerCountryCol.setCellValueFactory(new PropertyValueFactory<>("country"));
+        CustomerPostalCodeCol.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
+        CustomerPhoneNumberCol.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
+        CustomersTable.setItems(schedule.getAllCustomers());
+    }
+
+    private void populateAppointmentsTable(){
+        AppointmentIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        AppointmentTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+        AppointmentDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+        AppointmentLocationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
+        AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+        AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<>("start"));
+        AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<>("end"));
+        AppointmentCustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
+        AppointmentUserIdCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
+        AppointmentsTable.setItems(schedule.getAllAppointments());
+    }
+
+
+    private void setupCustomerTableSearch(){
+        //Set up anonymous callback function for the event listener on the Customers search field
+        filteredCustomers = new FilteredList<>(schedule.getAllCustomers(), p -> true);
+        CustomerSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> filteredCustomers.setPredicate(Customer -> {
+            if (newValue == null || newValue.isEmpty()) {
+                return true;
+            }
+            String lowerCaseFilter = newValue.toLowerCase();
+            //if search text equals Customer ID or name
+            return Customer.getName().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Customer.getId())); // Filter matches name or ID.
+        }));
+        SortedList<Customer> sortedCustomersData = new SortedList<>(filteredCustomers);
+        sortedCustomersData.comparatorProperty().bind(CustomersTable.comparatorProperty());
+        CustomersTable.setItems(sortedCustomersData);
+    }
+
+    private void setupAppointmentTableSearch(){
+        //Set up anonymous callback function for the event listener on the Appointments search field
+        filteredAppointments = new FilteredList<>(schedule.getAllAppointments(), p -> true);
+        AppointmentSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> filteredAppointments.setPredicate(Appointment -> {
+            if (newValue == null || newValue.isEmpty()) {
+                return true;
+            }
+            String lowerCaseFilter = newValue.toLowerCase();
+
+            //if search text equals Appointment ID or name
+            return Appointment.getTitle().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Appointment.getId())); // Filter matches title or ID.
+// Filter doesn't match.
+        }));
+
+        SortedList<Appointment> sortedAppointmentsData = new SortedList<>(filteredAppointments);
+        sortedAppointmentsData.comparatorProperty().bind(AppointmentsTable.comparatorProperty());
+        AppointmentsTable.setItems(sortedAppointmentsData);
     }
 }
