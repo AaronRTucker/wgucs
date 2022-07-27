@@ -36,6 +36,7 @@ public class ModifyCustomerController extends Controller {
     ResourceBundle bundle;
 
 
+
     //add Customer data fields
     @FXML private Label varField;
     @FXML private TextField CustomerIdField;

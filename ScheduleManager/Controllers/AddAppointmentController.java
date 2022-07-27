@@ -14,9 +14,8 @@ import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -35,9 +34,24 @@ public class AddAppointmentController extends Controller {
     public DatePicker endDateSelect;
     public ComboBox<Integer> customerIdDropdown;
     public ComboBox<Integer> userIdDropdown;
+
+    public ComboBox<Integer> startHourBox;
+    public ComboBox<Integer> endHourBox;
+    public ComboBox<Integer> startMinuteBox;
+    public ComboBox<Integer> endMinuteBox;
     private ResourceBundle bundle;
 
     private int nextAppointmentId;
+
+    @FXML
+    private int startHour;
+    @FXML
+    private int endHour;
+    @FXML
+    private int startMinute;
+    @FXML
+    private int endMinute;
+
 
 
 
@@ -46,6 +60,9 @@ public class AddAppointmentController extends Controller {
     private int selectedContactId;
     private Timestamp selectedStart;
     private Timestamp selectedEnd;
+
+    private String startDateString;
+    private String endDateString;
 
     private final String userName;    //name to store in database associating which user added this customer
 
@@ -57,6 +74,12 @@ public class AddAppointmentController extends Controller {
     public AddAppointmentController(int nextAppointmentId, String userName){
         this.nextAppointmentId = nextAppointmentId;                                                    //set the index of the first Customer and Appointment IDs to be 1
         this.userName = userName;
+        startHour = -1;
+        endHour = -1;
+        startMinute = -1;
+        endMinute = -1;
+        startDateString = "";
+        endDateString = "";
 
     }
 
@@ -78,6 +101,19 @@ public class AddAppointmentController extends Controller {
 
         bundle = resourceBundle;
 
+
+        //Populate hour and minute boxes
+        for(int i = 0; i < 24; i++){
+            startHourBox.getItems().addAll(i);
+            endHourBox.getItems().addAll(i);
+        }
+        for(int i = 0; i < 60; i++){
+            startMinuteBox.getItems().addAll(i);
+            endMinuteBox.getItems().addAll(i);
+        }
+
+
+        //Set default prompts
         contactDropdown.setPromptText("Select a contact");
         customerIdDropdown.setPromptText("Select a customer ID");
         userIdDropdown.setPromptText("Select a user ID");
@@ -124,6 +160,31 @@ public class AddAppointmentController extends Controller {
         //Get contact ID from selected contact name
         selectedContactId = DatabaseQueryHelper.getContactID(selectedContact);
     }
+    @FXML
+    public void startDatePressed(ActionEvent event){
+        startDateString = startDateSelect.getValue().toString();
+    }
+    @FXML
+    public void endDatePressed(ActionEvent event){
+        endDateString = endDateSelect.getValue().toString();
+    }
+
+    @FXML
+    public void startHourPressed(ActionEvent event){
+        startHour = startHourBox.getValue();
+    }
+    @FXML
+    public void endHourPressed(ActionEvent event){
+        endHour = endHourBox.getValue();
+    }
+    @FXML
+    public void startMinutePressed(ActionEvent event){
+        startMinute = startMinuteBox.getValue();
+    }
+    @FXML
+    public void endMinutePressed(ActionEvent event){
+        endMinute = endMinuteBox.getValue();
+    }
 
 
     /**
@@ -154,12 +215,6 @@ public class AddAppointmentController extends Controller {
     @FXML
     public void addAppointmentSavePressed(ActionEvent event){
 
-        //just temporary until we get date picker working
-        Instant instant = Instant.now() ;                           //get the current moment
-        OffsetDateTime odt = instant.atOffset( ZoneOffset.UTC ) ;   //get the current moment translated to UTC
-        Timestamp timestamp = Timestamp.valueOf(odt.toLocalDateTime());  //convert the current moment into a legacy format due to database datatype restrictions
-        selectedStart = timestamp;
-        selectedEnd = timestamp;
 
         int id = this.nextAppointmentId;
         this.nextAppointmentId++;
@@ -176,8 +231,30 @@ public class AddAppointmentController extends Controller {
                     Alert a = new Alert(Alert.AlertType.ERROR);
                     a.setContentText("Input Fields must not be empty");
                     a.show();
+                } else if(startMinute == -1 || startHour == -1 || endMinute == -1 || endHour == -1) {
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setContentText("Time Fields must not be empty");
+                    a.show();
+                } else if(startDateString.equals("") || endDateString.equals("")){
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setContentText("Date Fields must not be empty");
+                    a.show();
                 }else {
                     //Input is good
+
+                    //Format date inputs into a unified timestamp for start and end
+                    LocalDate datePart = LocalDate.parse(startDateString);
+                    LocalTime timePart = LocalTime.parse(startHour+":"+startMinute, DateTimeFormatter.ofPattern("H:m"));
+                    LocalDateTime dt = LocalDateTime.of(datePart, timePart);
+                    selectedStart = Timestamp.valueOf(dt);
+                    datePart = LocalDate.parse(endDateString);
+                    timePart = LocalTime.parse(endHour+":"+endMinute, DateTimeFormatter.ofPattern("H:m"));
+                    dt = LocalDateTime.of(datePart, timePart);
+                    selectedEnd = Timestamp.valueOf(dt);
+
+
+
+                    System.out.println(selectedStart);
 
                     DatabaseQueryHelper.addAppointment(id, title, description, location, selectedContactId, type, selectedStart, selectedEnd, selectedUserID, selectedCustomerID, userName);
 
