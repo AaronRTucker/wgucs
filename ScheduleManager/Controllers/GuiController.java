@@ -26,6 +26,7 @@ import java.util.ResourceBundle;
 
 public class GuiController extends Controller {
 
+
     private ResourceBundle bundle;
     private final Schedule schedule;
 
@@ -64,6 +65,7 @@ public class GuiController extends Controller {
     @FXML private TableColumn<Customer, String> AppointmentTitleCol;
     @FXML private TableColumn<Schedule, String> AppointmentDescriptionCol;
     @FXML private TableColumn<Schedule, String> AppointmentTypeCol;
+    @FXML public TableColumn<Schedule, String> AppointmentContactCol;
     @FXML private TableColumn<Schedule, String> AppointmentLocationCol;
     @FXML private TableColumn<Schedule, java.sql.Timestamp> AppointmentStartCol;
     @FXML private TableColumn<Schedule, java.sql.Timestamp> AppointmentEndCol;
@@ -203,6 +205,7 @@ public class GuiController extends Controller {
     @FXML
     public void deleteCustomerButton(ActionEvent event)
     {
+        //Need to add code that deletes all customer appointments
         selectedCustomer = CustomersTable.getSelectionModel().getSelectedItem();
         Alert a;
         Optional<ButtonType> result;
@@ -214,15 +217,20 @@ public class GuiController extends Controller {
         } else {
             a = new Alert(Alert.AlertType.CONFIRMATION);
             a.setTitle("Customer deletion");
-            a.setHeaderText("You are about to delete Customer: " + selectedCustomer.getName());
+            a.setHeaderText("You are about to delete Customer: " + selectedCustomer.getName() + " and all of their appointments.");
             a.setContentText("Are you sure you want to do this?");
             result = a.showAndWait();
             if(result.isPresent()) {
                 if (result.get() == ButtonType.OK) {
-                    DatabaseQueryHelper.deleteCustomer(schedule, selectedCustomer);//delete the customer from the database
+                    schedule.deleteCustomer(selectedCustomer);
+                    DatabaseQueryHelper.deleteCustomer(selectedCustomer);//delete the customer from the database
                 }
             }
         }
+
+        //refresh the page to make sure any related appointments are cleared
+        Controller c = new GuiController(userName);
+        loadScene(c, event, "ScheduleManager/Views/gui.fxml", 900, 475, bundle);
     }
 
 
@@ -254,26 +262,9 @@ public class GuiController extends Controller {
             a.setContentText("Please select a Appointment to modify");
             a.show();
         } else {
-            //temporaryAssociatedCustomers = selectedAppointment.getAllAssociatedCustomers();
-            //loadScene(this.event, "ScheduleManager/Views/modifyAppointment.fxml", 900, 675);
-
-            //ID will be generated and incremented automatically
-            //this code has to be run after the stage has been swapped, if run before it will throw a null error
-            /*
-            AppointmentIdField.setEditable(false);
-            AppointmentIdField.setText(String.valueOf(selectedAppointment.getId()));
-            AppointmentTitleField.setText(selectedAppointment.getTitle());
-            AppointmentDescriptionField.setText(selectedAppointment.getDescription());
-            AppointmentLocationField.setText(selectedAppointment.getLocation());
-            AppointmentTypeField.setText(selectedAppointment.getType());
-            AppointmentStartField.setText(String.valueOf(selectedAppointment.getStart()));
-            AppointmentEndField.setText(String.valueOf(selectedAppointment.getEnd()));
-            AppointmentCustomerIdField.setText(String.valueOf(selectedAppointment.getCustomerId()));
-            AppointmentUserIdField.setText(String.valueOf(selectedAppointment.getUserId()));
-
-            */
+            ModifyAppointmentController c = new ModifyAppointmentController(userName, selectedAppointment);
+            loadScene(c, event, "ScheduleManager/Views/modifyAppointment.fxml", 900, 675, bundle);
         }
-
     }
 
     /**
@@ -289,13 +280,9 @@ public class GuiController extends Controller {
         //Handle the error where no Appointment is selected
         if(selectedAppointment == null){
             a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Please select a Appointment to delete");
+            a.setContentText("Please select an Appointment to delete");
             a.show();
-            //Handle the error where a Appointment has associate Customers still
-        } else if( selectedAppointment.getAllAssociatedCustomers().size() > 0) {
-            a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Cannot delete a Appointment with associated Customers");
-            a.show();
+            //Handle the error where an Appointment has associate Customers still
         }else{  //everything is checked, just need to confirm deletion
             a = new Alert(Alert.AlertType.CONFIRMATION);
             a.setTitle("Appointment deletion");
@@ -305,6 +292,7 @@ public class GuiController extends Controller {
             if(result.isPresent()){
                 if (result.get() == ButtonType.OK) {
                     schedule.deleteAppointment(selectedAppointment);
+                    DatabaseQueryHelper.deleteAppointment(selectedAppointment);
                 }
             }
         }
@@ -361,6 +349,7 @@ public class GuiController extends Controller {
         AppointmentTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         AppointmentDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
         AppointmentLocationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
+        AppointmentContactCol.setCellValueFactory(new PropertyValueFactory<>("contact"));
         AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
         AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<>("start"));
         AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<>("end"));

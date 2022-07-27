@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="startDateSelect" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="648.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="648.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
     <Label layoutX="31.0" layoutY="36.0" text="Add Appointment" />
     <Button fx:id="cancel" layoutX="774.0" layoutY="609.0" mnemonicParsing="false" onAction="#addAppointmentCancelPressed" text="Cancel" />
     <Label layoutX="261.0" layoutY="178.0" text="ID" />
@@ -19,7 +19,7 @@
     <TextField fx:id="appointmentTypeField" layoutX="349.0" layoutY="361.0" prefHeight="25.0" prefWidth="77.0" />
     <Button fx:id="save" layoutX="681.0" layoutY="609.0" mnemonicParsing="false" onAction="#addAppointmentSavePressed" text="Save" />
     <ComboBox fx:id="contactDropdown" layoutX="349.0" layoutY="322.0" onAction="#contactBoxPressed" prefWidth="150.0" />
-    <DatePicker layoutX="349.0" layoutY="399.0" />
+    <DatePicker fx:id="startDateSelect" layoutX="349.0" layoutY="399.0" />
     <Label layoutX="254.0" layoutY="403.0" text="Start" />
     <Label layoutX="257.0" layoutY="437.0" text="End" />
     <DatePicker fx:id="endDateSelect" layoutX="349.0" layoutY="433.0" />

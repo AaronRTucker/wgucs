@@ -7,6 +7,7 @@
 package ScheduleManager.Controllers;
 
 import ScheduleManager.DBHelper.DatabaseQueryHelper;
+import ScheduleManager.Models.Appointment;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -20,7 +21,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-public class AddAppointmentController extends Controller {
+public class ModifyAppointmentController extends Controller {
 
     //add appointment data fields
     public DatePicker startDateSelect;
@@ -32,6 +33,7 @@ public class AddAppointmentController extends Controller {
     public TextField appointmentTypeField;
     public Button save;
     public ComboBox<String> contactDropdown;
+
     public DatePicker endDateSelect;
     public ComboBox<Integer> customerIdDropdown;
     public ComboBox<Integer> userIdDropdown;
@@ -47,6 +49,8 @@ public class AddAppointmentController extends Controller {
     private Timestamp selectedStart;
     private Timestamp selectedEnd;
 
+    private final Appointment selectedAppointment;
+
     private final String userName;    //name to store in database associating which user added this customer
 
 
@@ -54,8 +58,8 @@ public class AddAppointmentController extends Controller {
 
 
     //Constructor for new Controller object
-    public AddAppointmentController(int nextAppointmentId, String userName){
-        this.nextAppointmentId = nextAppointmentId;                                                    //set the index of the first Customer and Appointment IDs to be 1
+    public ModifyAppointmentController(String userName, Appointment selectedAppointment){
+        this.selectedAppointment= selectedAppointment;                                                    //set the index of the first Customer and Appointment IDs to be 1
         this.userName = userName;
 
     }
@@ -71,17 +75,32 @@ public class AddAppointmentController extends Controller {
     @Override
     public void initialize( URL url, ResourceBundle resourceBundle) {
 
-        appointmentIdField.setEditable(false);
-        appointmentIdField.setText(String.valueOf(this.nextAppointmentId));
 
-        selectedContactId = -1;        //used to check if contact has been selected before creating appointment
+        //Write settings from imported appointment object to the local variables and populate text and dropdown fields
+        appointmentIdField.setEditable(false);
+        appointmentIdField.setText(String.valueOf(selectedAppointment.getId()));
+
+        appointmentDescField.setText(selectedAppointment.getDescription());
+        appointmentLocationField.setText(selectedAppointment.getLocation());
+        appointmentTitleField.setText(selectedAppointment.getTitle());
+        appointmentTypeField.setText(selectedAppointment.getType());
+
 
         bundle = resourceBundle;
 
-        contactDropdown.setPromptText("Select a contact");
-        customerIdDropdown.setPromptText("Select a customer ID");
-        userIdDropdown.setPromptText("Select a user ID");
+        selectedUserID = selectedAppointment.getUserId();
+        selectedCustomerID = selectedAppointment.getCustomerId();
+        selectedStart = selectedAppointment.getStart();
+        selectedEnd = selectedAppointment.getEnd();
 
+        selectedContactId = DatabaseQueryHelper.getContactID(selectedAppointment.getContact());
+
+        contactDropdown.setPromptText(selectedAppointment.getContact());
+        customerIdDropdown.setPromptText(String.valueOf(selectedAppointment.getCustomerId()));
+        userIdDropdown.setPromptText(String.valueOf(selectedAppointment.getUserId()));
+
+        startDateSelect.setPromptText(selectedAppointment.getStart().toString());
+        endDateSelect.setPromptText(selectedAppointment.getEnd().toString());
 
         //Get contacts list from database
         ArrayList<String> contacts = DatabaseQueryHelper.getContacts();
@@ -154,16 +173,9 @@ public class AddAppointmentController extends Controller {
     @FXML
     public void addAppointmentSavePressed(ActionEvent event){
 
-        //just temporary until we get date picker working
-        Instant instant = Instant.now() ;                           //get the current moment
-        OffsetDateTime odt = instant.atOffset( ZoneOffset.UTC ) ;   //get the current moment translated to UTC
-        Timestamp timestamp = Timestamp.valueOf(odt.toLocalDateTime());  //convert the current moment into a legacy format due to database datatype restrictions
-        selectedStart = timestamp;
-        selectedEnd = timestamp;
 
-        int id = this.nextAppointmentId;
-        this.nextAppointmentId++;
             try {
+                int id = selectedAppointment.getId();
                 String title = appointmentTitleField.getText();
                 String description = appointmentDescField.getText();
                 String location = appointmentLocationField.getText();
@@ -179,7 +191,7 @@ public class AddAppointmentController extends Controller {
                 }else {
                     //Input is good
 
-                    DatabaseQueryHelper.addAppointment(id, title, description, location, selectedContactId, type, selectedStart, selectedEnd, selectedUserID, selectedCustomerID, userName);
+                    DatabaseQueryHelper.modifyAppointment(id, title, description, location, selectedContactId, type, selectedStart, selectedEnd, selectedUserID, selectedCustomerID, userName);
 
                     addAppointmentCancelPressed(event);        //return to home screen if there are no errors
                 }

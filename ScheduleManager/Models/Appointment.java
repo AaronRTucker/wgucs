@@ -24,9 +24,13 @@ public class Appointment {
     private int customerId;
 
 
+
+    private String contact;
+
+
     private int userId;
 
-    public Appointment(int id, String title, String description, String location, String type, java.sql.Timestamp start, java.sql.Timestamp end, int customerId, int userId){
+    public Appointment(int id, String title, String description, String location, String type, java.sql.Timestamp start, java.sql.Timestamp end, int customerId, int userId, String contact){
         this.associatedCustomers = FXCollections.observableArrayList();
         this.id = id;
         this.title = title;
@@ -37,6 +41,7 @@ public class Appointment {
         this.end = end;
         this.customerId = customerId;
         this.userId = userId;
+        this.contact = contact;
 
     }
 
@@ -111,6 +116,14 @@ public class Appointment {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 
 

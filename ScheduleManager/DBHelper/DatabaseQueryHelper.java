@@ -93,7 +93,10 @@ public abstract class DatabaseQueryHelper {
             PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`appointments`");
             ResultSet result = ps.executeQuery();
             while (result.next()) {
+                int contactID = result.getInt("Contact_ID");
+                String contactName = getContactName(contactID);
                 Appointment a = new Appointment(
+
                         result.getInt("Appointment_ID"),
                         result.getString("Title"),
                         result.getString("Description"),
@@ -102,7 +105,8 @@ public abstract class DatabaseQueryHelper {
                         result.getTimestamp("Start"),
                         result.getTimestamp("End"),
                         result.getInt("Customer_ID"),
-                        result.getInt("User_ID")
+                        result.getInt("User_ID"),
+                        contactName
                 );
                 schedule.addAppointment(a);
             }
@@ -112,10 +116,60 @@ public abstract class DatabaseQueryHelper {
         }
     }
 
-    public static void deleteCustomer(Schedule schedule, Customer customer){
-        schedule.deleteCustomer(customer);
+    public static String getContactName (int contactID){
+
+        //Get contact name from database
+        try {
+            //if(countryID) {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`contacts` WHERE Contact_ID = " + contactID + ";");
+            //}
+            ResultSet result = ps.executeQuery();
+
+            if (result.next() ) {
+                return result.getString("Contact_Name");
+            }
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        return "Not found";
+    }
+    public static void deleteCustomer(Customer customer){
+
+        deleteCustomerAppointments(customer);       //due to foreign key constraints, delete all associated appointments first
 
         String sql = ("DELETE FROM client_schedule.customers WHERE Customer_ID = " + customer.getId() + " ");
+        System.out.println(sql);
+
+        try {
+            Connection conn = JDBC.connection;
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+            System.out.println("Deleted records in the table...");
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteCustomerAppointments(Customer customer){
+        String sql = ("DELETE FROM client_schedule.appointments WHERE Customer_ID = " + customer.getId() + " ");
+        System.out.println(sql);
+
+        try {
+            Connection conn = JDBC.connection;
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+            System.out.println("Deleted records in the table...");
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteAppointment(Appointment appointment){
+        String sql = ("DELETE FROM client_schedule.appointments WHERE Appointment_ID = " + appointment.getId() + " ");
         System.out.println(sql);
 
         try {
@@ -365,6 +419,38 @@ public abstract class DatabaseQueryHelper {
         }
     }
 
+    public static void modifyAppointment(int id, String title,String description,String location, int contactId, String type, Timestamp start, Timestamp end, int userID, int customerID, String userName){
+        Instant instant = Instant.now() ;                           //get the current moment
+        OffsetDateTime odt = instant.atOffset( ZoneOffset.UTC ) ;   //get the current moment translated to UTC
+        Timestamp timestamp = Timestamp.valueOf(odt.toLocalDateTime());  //convert the current moment into a legacy format due to database datatype restrictions
+
+        String sql = (          //create_date uses datetime, last_update uses timestamp.  Only timestamp is aware of timezone information
+                "UPDATE client_schedule.appointments SET " +
+                        "Title='" + title+"', " +
+                        "Description='" + description+"', " +
+                        "Location='" + location+"', " +
+                        "Type='" + type+"', " +
+                        "Start='" + start+"', " +
+                        "End='" + end+"', " +
+                        "Last_Update='" + timestamp+"', " +
+                        "Last_Updated_By='" + userName+"', " +
+                        "Customer_ID=" + customerID+", " +
+                        "User_ID=" + userID+", " +
+                        "Contact_ID=" + contactId+" " +
+                        "WHERE Appointment_ID = " + id + " ");
+        System.out.println(sql);
+
+        try {
+            Connection conn = JDBC.connection;
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+            System.out.println("Inserted records into the table...");
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
     public static void modifyCustomer(int id,String name,String address,String postalCode,String phoneNumber,String userName,int selectedDivisionID){
         //Input is good
 
@@ -378,7 +464,6 @@ public abstract class DatabaseQueryHelper {
                 "Address='"+address+"', " +
                 "Postal_Code='"+postalCode+"', " +
                 "Phone = '"+phoneNumber+"', " +
-                "Created_By = '"+userName+"', " +
                 "Last_Update = '"+timestamp+"', " +
                 "Last_Updated_By = '"+userName+"'," +
                 "Division_ID = "+selectedDivisionID+" " +
