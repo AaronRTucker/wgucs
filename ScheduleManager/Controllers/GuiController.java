@@ -21,6 +21,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 
 import java.net.URL;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -80,6 +84,14 @@ public class GuiController extends Controller {
     @FXML private Button delAppointmentBtn;
     @FXML private Button modAppointmentBtn;
 
+    @FXML private RadioButton weekRadio;
+    @FXML private RadioButton monthRadio;
+    @FXML private DatePicker dateFilter;
+
+    private boolean weekSelected;
+    private int weekNumberSelected;
+    private int monthNumberSelected;
+
 
 
     private final String userName;        //name of the logged-in user
@@ -119,6 +131,11 @@ public class GuiController extends Controller {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        //initialize radio button flip/flop logic
+        weekSelected = false;
+        weekRadio.setSelected(false);
+        monthRadio.setSelected(true);
+
         bundle = resourceBundle;
 
 
@@ -149,6 +166,9 @@ public class GuiController extends Controller {
 
         //Set up appointment search callback function
         setupAppointmentTableSearch();
+
+        //Set up appointment date filter callback function
+        setupAppointmentTableDateSearch();
 
     }
 
@@ -198,6 +218,40 @@ public class GuiController extends Controller {
         }
     }
 
+    @FXML
+    public void weekRadioPressed(ActionEvent event){
+        weekSelected = true;
+        weekRadio.setSelected(true);
+        monthRadio.setSelected(false);
+
+        //make a change to the selected date so that it triggers the date filter to run again
+        LocalDate temp = dateFilter.getValue();
+        dateFilter.setValue(LocalDate.now());
+        dateFilter.setValue(temp);
+    }
+
+    @FXML
+    public void monthRadioPressed(ActionEvent event){
+        weekSelected = false;
+        weekRadio.setSelected(false);
+        monthRadio.setSelected(true);
+
+        //make a change to the selected date so that it triggers the date filter to run again
+        LocalDate temp = dateFilter.getValue();
+        dateFilter.setValue(LocalDate.now());
+        dateFilter.setValue(temp);
+    }
+
+    @FXML
+    public void dateFilterPressed(ActionEvent event){
+        LocalDate date = dateFilter.getValue(); // input from user
+        Locale locale = Locale.getDefault();
+        weekNumberSelected = date.get(WeekFields.of(locale).weekOfWeekBasedYear());
+        monthNumberSelected = date.getMonthValue();
+        //System.out.println(weekNumberSelected);
+        //System.out.println(monthNumberSelected);
+    }
+
     /**
      * Handles deleting Customers
      * @param event the action event
@@ -242,11 +296,6 @@ public class GuiController extends Controller {
     public void addAppointmentButtonPressed(ActionEvent event){
         AddAppointmentController c = new AddAppointmentController(nextAppointmentId, userName);
         loadScene(c, event, "ScheduleManager/Views/addAppointment.fxml", 900, 675, bundle );
-
-        //ID will be generated and incremented automatically
-        //this code has to be run after the stage has been swapped, if run before it will throw a null error
-        //AppointmentIdField.setEditable(false);
-        //AppointmentIdField.setText(String.valueOf(this.nextAppointmentId));
     }
 
     /**
@@ -389,6 +438,35 @@ public class GuiController extends Controller {
 // Filter doesn't match.
         }));
 
+        SortedList<Appointment> sortedAppointmentsData = new SortedList<>(filteredAppointments);
+        sortedAppointmentsData.comparatorProperty().bind(AppointmentsTable.comparatorProperty());
+        AppointmentsTable.setItems(sortedAppointmentsData);
+    }
+
+    private void setupAppointmentTableDateSearch(){
+        //Set up anonymous callback function for the event listener on the Appointments date filter
+        filteredAppointments = new FilteredList<>(schedule.getAllAppointments(), p -> true);
+        dateFilter.valueProperty().addListener((observable, oldValue, newValue) -> filteredAppointments.setPredicate(Appointment -> {
+                if (newValue == null) {
+                    return true;
+                }
+                LocalDate date = newValue; // input from user
+                Locale locale = Locale.getDefault();
+                weekNumberSelected = date.get(WeekFields.of(locale).weekOfWeekBasedYear());
+                monthNumberSelected = date.getMonthValue();
+
+                if (weekSelected) {
+                    LocalDate appStart = Appointment.getStart().toLocalDateTime().toLocalDate();
+                    int appStartWeek = appStart.get(WeekFields.of(locale).weekOfWeekBasedYear());
+                    //if selected week matches
+                    return weekNumberSelected == appStartWeek;
+                } else {
+                    LocalDate appStart = Appointment.getStart().toLocalDateTime().toLocalDate();
+                    int appStartMonth = appStart.getMonthValue();
+                    //if selected month matches
+                    return monthNumberSelected == appStartMonth;
+                }
+            }));
         SortedList<Appointment> sortedAppointmentsData = new SortedList<>(filteredAppointments);
         sortedAppointmentsData.comparatorProperty().bind(AppointmentsTable.comparatorProperty());
         AppointmentsTable.setItems(sortedAppointmentsData);
