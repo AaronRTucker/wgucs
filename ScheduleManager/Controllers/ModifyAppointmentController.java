@@ -92,6 +92,8 @@ public class ModifyAppointmentController extends Controller {
     @Override
     public void initialize( URL url, ResourceBundle resourceBundle) {
 
+        initClocks();
+
         bundle = resourceBundle;
 
 

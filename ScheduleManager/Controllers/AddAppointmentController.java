@@ -94,6 +94,8 @@ public class AddAppointmentController extends Controller {
     @Override
     public void initialize( URL url, ResourceBundle resourceBundle) {
 
+        initClocks();
+
         appointmentIdField.setEditable(false);
         appointmentIdField.setText(String.valueOf(this.nextAppointmentId));
 
@@ -241,6 +243,11 @@ public class AddAppointmentController extends Controller {
                     a.show();
                 }else {
                     //Input is good
+
+                    //Need to check if the app end time is after the start time
+                    //Need to check if the app start and end time is between business hours EST time
+                    //Need to make sure schedules don't overlap
+
 
                     //Format date inputs into a unified timestamp for start and end
                     LocalDate datePart = LocalDate.parse(startDateString);

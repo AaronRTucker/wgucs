@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="854.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="472.0" prefWidth="854.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
     <TableView fx:id="CustomersTable" layoutX="15.0" layoutY="111.0" prefHeight="200.0" prefWidth="390.0">
         <columns>
             <TableColumn fx:id="CustomerIdCol" prefWidth="75.0" text="ID" />
@@ -49,5 +49,11 @@
    <DatePicker fx:id="dateFilter" layoutX="441.0" layoutY="86.0" onAction="#dateFilterPressed" />
    <RadioButton fx:id="weekRadio" layoutX="461.0" layoutY="61.0" mnemonicParsing="false" onAction="#weekRadioPressed" text="Week" />
    <RadioButton fx:id="monthRadio" layoutX="547.0" layoutY="61.0" mnemonicParsing="false" onAction="#monthRadioPressed" text="Month" />
+   <Label layoutX="10.0" layoutY="367.0" text="Your local time" />
+   <Label layoutX="10.0" layoutY="385.0" text="Office Time" />
+   <Label layoutX="10.0" layoutY="403.0" text="UTC Time" />
+   <Label fx:id="localTime" layoutX="123.0" layoutY="367.0" text="LocalTime" />
+   <Label fx:id="easternTime" layoutX="122.0" layoutY="385.0" text="EST" />
+   <Label fx:id="universalTime" layoutX="121.0" layoutY="403.0" text="UTC" />
 
 </AnchorPane>

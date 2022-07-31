@@ -52,6 +52,7 @@ public class LoginController extends Controller {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         bundle = resourceBundle;        //save resource bundle to use in callback functions
         zoneID.setText(String.valueOf(ZoneId.systemDefault()));
+        initClocks();
 
     }
 
@@ -99,6 +100,8 @@ public class LoginController extends Controller {
                 if (loginPasswordField.getText().equals(password)) {        //insecure, should be checked on database if you don't trust the client
                     Controller c = new GuiController(userName);
                     loadScene(c, event, "ScheduleManager/Views/gui.fxml", 900, 475, bundle);
+
+
                 } else {
                     Alert a = new Alert(Alert.AlertType.ERROR);
                     a.setTitle(bundle.getString("Error"));

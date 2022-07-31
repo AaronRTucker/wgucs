@@ -11,6 +11,9 @@ import ScheduleManager.DBHelper.DatabaseQueryHelper;
 import ScheduleManager.Models.Appointment;
 import ScheduleManager.Models.Customer;
 import ScheduleManager.Models.Schedule;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -19,11 +22,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
+import javafx.util.Duration;
 
 import java.net.URL;
 import java.sql.Timestamp;
-import java.time.LocalDate;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -88,6 +94,8 @@ public class GuiController extends Controller {
     @FXML private RadioButton monthRadio;
     @FXML private DatePicker dateFilter;
 
+
+
     private boolean weekSelected;
     private int weekNumberSelected;
     private int monthNumberSelected;
@@ -130,6 +138,26 @@ public class GuiController extends Controller {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        //Need to alert user if there is an appt within 15 minutes from current time
+
+
+        //Need to create a report button that generates info
+
+        /*Write code that generates accurate information in each of the following reports and will display the reports in the user interface:
+Note: You do not need to save and print the reports to a file or provide a screenshot.
+•  the total number of customer appointments by type and month
+
+•  a schedule for each contact in your organization that includes appointment ID, title, type and description, start date and time, end date and time, and customer ID
+
+•  an additional report of your choice that is different from the two other required reports in this prompt and from the user log-in date and time stamp that will be tracked in part C
+B.  Write at least two different lambda expressions to improve your code.
+C.  Write code that provides the ability to track user activity by recording all user log-in attempts, dates, and time stamps and whether each attempt was successful in a file named login_activity.txt. Append each new record to the existing file, and save to the root folder of the application.
+
+
+         */
+
+        initClocks();
 
         //initialize radio button flip/flop logic
         weekSelected = false;

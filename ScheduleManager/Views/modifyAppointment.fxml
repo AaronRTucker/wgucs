@@ -33,4 +33,11 @@
     <ComboBox fx:id="startMinuteBox" layoutX="642.0" layoutY="398.0" onAction="#startMinutePressed" prefHeight="26.0" prefWidth="78.0" />
     <ComboBox fx:id="endHourBox" layoutX="542.0" layoutY="433.0" onAction="#endHourPressed" prefHeight="26.0" prefWidth="78.0" />
     <ComboBox fx:id="endMinuteBox" layoutX="642.0" layoutY="433.0" onAction="#endMinutePressed" prefHeight="26.0" prefWidth="78.0" />
+
+    <Label layoutX="247.0" layoutY="544.0" text="Your local time" />
+    <Label layoutX="247.0" layoutY="562.0" text="Office Time" />
+    <Label layoutX="247.0" layoutY="580.0" text="UTC Time" />
+    <Label fx:id="localTime" layoutX="360.0" layoutY="544.0" text="LocalTime" />
+    <Label fx:id="easternTime" layoutX="359.0" layoutY="562.0" text="EST" />
+    <Label fx:id="universalTime" layoutX="358.0" layoutY="580.0" text="UTC" />
 </AnchorPane>
