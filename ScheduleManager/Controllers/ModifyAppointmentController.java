@@ -15,10 +15,8 @@ import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -223,8 +221,23 @@ public class ModifyAppointmentController extends Controller {
                     Alert a = new Alert(Alert.AlertType.ERROR);
                     a.setContentText("Input Fields must not be empty");
                     a.show();
-                }else {
+                }else if(selectedStart.after(selectedEnd)) {
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setContentText("End time must be after start time");
+                    a.show();
+                } else {
                     //Input is good
+
+                    //add the local time offset
+
+                    ZoneId zone = ZoneId.systemDefault();
+                    ZonedDateTime zdt = selectedStart.toLocalDateTime().atZone(zone);
+                    ZoneOffset offset = zdt.getOffset();
+                    selectedStart = Timestamp.valueOf(selectedStart.toLocalDateTime().minus(offset.getTotalSeconds(), ChronoUnit.SECONDS));
+                    selectedEnd = Timestamp.valueOf(selectedEnd.toLocalDateTime().minus(offset.getTotalSeconds(), ChronoUnit.SECONDS));
+
+                    //check all the other error possibilities like in add appt
+
 
                     DatabaseQueryHelper.modifyAppointment(id, title, description, location, selectedContactId, type, selectedStart, selectedEnd, selectedUserID, selectedCustomerID, userName);
 
@@ -258,12 +271,21 @@ public class ModifyAppointmentController extends Controller {
 
         Timestamp st = selectedAppointment.getStart();
         LocalDateTime sdt = st.toLocalDateTime();
+        //convert to local timezone
+        ZoneId zone = ZoneId.systemDefault();
+        ZonedDateTime zdt = sdt.atZone(zone);
+        ZoneOffset offset = zdt.getOffset();
+        sdt = sdt.plus(offset.getTotalSeconds(), ChronoUnit.SECONDS);
+
         startDateString = sdt.toLocalDate().toString();
         startHour = sdt.toLocalTime().getHour();
         startMinute = sdt.toLocalTime().getMinute();
 
         Timestamp et = selectedAppointment.getEnd();
         LocalDateTime edt = et.toLocalDateTime();
+        //convert to local timezone
+        edt = edt.plus(offset.getTotalSeconds(), ChronoUnit.SECONDS);
+
         endDateString = edt.toLocalDate().toString();
         endHour = edt.toLocalTime().getHour();
         endMinute = edt.toLocalTime().getMinute();

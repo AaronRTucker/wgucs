@@ -13,11 +13,16 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 
 public class AddAppointmentController extends Controller {
 
@@ -80,6 +85,10 @@ public class AddAppointmentController extends Controller {
         endMinute = -1;
         startDateString = "";
         endDateString = "";
+
+        String tzid = "EST";
+        TimeZone tz = TimeZone.getTimeZone(tzid);
+
 
     }
 
@@ -241,9 +250,10 @@ public class AddAppointmentController extends Controller {
                     Alert a = new Alert(Alert.AlertType.ERROR);
                     a.setContentText("Date Fields must not be empty");
                     a.show();
-                }else {
+                }else{
                     //Input is good
 
+                    //Need to change datetime to UTC - done, test this
                     //Need to check if the app end time is after the start time
                     //Need to check if the app start and end time is between business hours EST time
                     //Need to make sure schedules don't overlap
@@ -253,19 +263,62 @@ public class AddAppointmentController extends Controller {
                     LocalDate datePart = LocalDate.parse(startDateString);
                     LocalTime timePart = LocalTime.parse(startHour+":"+startMinute, DateTimeFormatter.ofPattern("H:m"));
                     LocalDateTime dt = LocalDateTime.of(datePart, timePart);
-                    selectedStart = Timestamp.valueOf(dt);
+
+                    //add the local time offset
+                    ZoneId zone = ZoneId.systemDefault();
+                    ZonedDateTime zdt = dt.atZone(zone);
+                    ZoneOffset offset = zdt.getOffset();
+                    selectedStart = Timestamp.valueOf(dt.minus(offset.getTotalSeconds(), ChronoUnit.SECONDS));
+
                     datePart = LocalDate.parse(endDateString);
                     timePart = LocalTime.parse(endHour+":"+endMinute, DateTimeFormatter.ofPattern("H:m"));
                     dt = LocalDateTime.of(datePart, timePart);
-                    selectedEnd = Timestamp.valueOf(dt);
+
+                    //add the local time offset
+                    selectedEnd = Timestamp.valueOf(dt.minus(offset.getTotalSeconds(), ChronoUnit.SECONDS));
 
 
+
+                    //check if end time is after start time
+
+                    ZoneId eastern = ZoneId.of("US/Eastern");
+                    ZonedDateTime edt = selectedStart.toLocalDateTime().atZone(eastern);
+                    ZoneOffset easternOffset = edt.getOffset();
+
+                    Timestamp easternStart = Timestamp.valueOf(selectedStart.toLocalDateTime().plus(easternOffset.getTotalSeconds(), ChronoUnit.SECONDS));
+                    Timestamp easternEnd = Timestamp.valueOf(selectedEnd.toLocalDateTime().plus(easternOffset.getTotalSeconds(), ChronoUnit.SECONDS));
+
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(easternStart.getTime());
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH");
+                    String easternStartHour = sdf.format(calendar.getTime());
+                    int easternStartInt = Integer.parseInt(easternStartHour);
+                    calendar.setTimeInMillis(easternEnd.getTime());
+                    String easternEndHour = sdf.format(calendar.getTime());
+                    int easternEndInt = Integer.parseInt(easternEndHour);
+
+                    System.out.println(easternStartInt);
+                    System.out.println(easternEndInt);
+
+                    if(selectedStart.after(selectedEnd)){
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setContentText("End time must be after start time");
+                        a.show();
+                    }else if(easternStartInt < 8){
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setContentText("Start time must be after 8AM EST");
+                        a.show();
+                    } else if(easternEndInt >= 20){
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setContentText("End time must be before 10PM EST");
+                        a.show();
+                    }  else {
+                        DatabaseQueryHelper.addAppointment(id, title, description, location, selectedContactId, type, selectedStart, selectedEnd, selectedUserID, selectedCustomerID, userName);
+                        addAppointmentCancelPressed(event);        //return to home screen if there are no errors
+                    }
 
                     System.out.println(selectedStart);
 
-                    DatabaseQueryHelper.addAppointment(id, title, description, location, selectedContactId, type, selectedStart, selectedEnd, selectedUserID, selectedCustomerID, userName);
-
-                    addAppointmentCancelPressed(event);        //return to home screen if there are no errors
                 }
             } catch (Exception e) {
                 Alert a = new Alert(Alert.AlertType.ERROR);

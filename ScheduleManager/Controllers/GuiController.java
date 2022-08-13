@@ -11,10 +11,9 @@ import ScheduleManager.DBHelper.DatabaseQueryHelper;
 import ScheduleManager.Models.Appointment;
 import ScheduleManager.Models.Customer;
 import ScheduleManager.Models.Schedule;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -22,14 +21,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
-import javafx.util.Duration;
+import javafx.util.Callback;
 
 import java.net.URL;
 import java.sql.Timestamp;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
-import java.util.Calendar;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -77,8 +75,8 @@ public class GuiController extends Controller {
     @FXML private TableColumn<Schedule, String> AppointmentTypeCol;
     @FXML public TableColumn<Schedule, String> AppointmentContactCol;
     @FXML private TableColumn<Schedule, String> AppointmentLocationCol;
-    @FXML private TableColumn<Schedule, java.sql.Timestamp> AppointmentStartCol;
-    @FXML private TableColumn<Schedule, java.sql.Timestamp> AppointmentEndCol;
+    @FXML private TableColumn<Appointment, String> AppointmentStartCol;
+    @FXML private TableColumn<Appointment, String> AppointmentEndCol;
     @FXML private TableColumn<Schedule, Integer> AppointmentCustomerIdCol;
     @FXML private TableColumn<Schedule, Integer> AppointmentUserIdCol;
 
@@ -428,8 +426,26 @@ C.  Write code that provides the ability to track user activity by recording all
         AppointmentLocationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
         AppointmentContactCol.setCellValueFactory(new PropertyValueFactory<>("contact"));
         AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-        AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<>("start"));
-        AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<>("end"));
+        //AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<>("start"));     //replaced with timezone offset version below
+        AppointmentStartCol.setCellValueFactory(appt -> {
+            //Convert from UTC stored in the database to local timezone in the app
+            Timestamp startTime = appt.getValue().getStart();
+            ZoneId zone = ZoneId.systemDefault();
+            ZonedDateTime zdt = startTime.toLocalDateTime().atZone(zone);
+            ZoneOffset offset = zdt.getOffset();
+            return Bindings.createStringBinding(() -> "" + startTime.toLocalDateTime().plus(offset.getTotalSeconds(), ChronoUnit.SECONDS) + " " + ZoneId.systemDefault());
+        });
+
+
+        //AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<>("end")); //replaced with timezone offset version below
+        AppointmentEndCol.setCellValueFactory(appt -> {
+            //Convert from UTC stored in the database to local timezone in the app
+            Timestamp endTime = appt.getValue().getEnd();
+            ZoneId zone = ZoneId.systemDefault();
+            ZonedDateTime zdt = endTime.toLocalDateTime().atZone(zone);
+            ZoneOffset offset = zdt.getOffset();
+            return Bindings.createStringBinding(() -> "" + endTime.toLocalDateTime().plus(offset.getTotalSeconds(), ChronoUnit.SECONDS) + " " + ZoneId.systemDefault());
+        });
         AppointmentCustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
         AppointmentUserIdCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
         AppointmentsTable.setItems(schedule.getAllAppointments());
