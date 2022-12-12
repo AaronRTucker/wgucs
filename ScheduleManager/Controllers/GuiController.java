@@ -88,6 +88,8 @@ public class GuiController extends Controller {
     @FXML private Button delAppointmentBtn;
     @FXML private Button modAppointmentBtn;
 
+    @FXML private Button reportsButton;
+
     @FXML private RadioButton weekRadio;
     @FXML private RadioButton monthRadio;
     @FXML private DatePicker dateFilter;
@@ -276,6 +278,12 @@ C.  Write code that provides the ability to track user activity by recording all
         monthNumberSelected = date.getMonthValue();
         //System.out.println(weekNumberSelected);
         //System.out.println(monthNumberSelected);
+    }
+
+    @FXML
+    public void reportsButtonPressed(ActionEvent event){
+        Controller c = new ReportController(userName);
+        loadScene(c, event, "ScheduleManager/Views/reports.fxml", 900, 475, bundle);
     }
 
     /**

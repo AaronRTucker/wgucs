@@ -261,6 +261,8 @@ public class ModifyAppointmentController extends Controller {
     }
 
     public void importAppointmentData(){
+        //doesn't give right time?
+        //Need to copy code from addAppointmentController
         appointmentIdField.setEditable(false);
         appointmentIdField.setText(String.valueOf(selectedAppointment.getId()));
 

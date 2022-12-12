@@ -6,17 +6,24 @@
 
 package ScheduleManager.Controllers;
 
+import ScheduleManager.DBHelper.DatabaseQueryHelper;
 import ScheduleManager.DBHelper.JDBC;
+import ScheduleManager.Models.Appointment;
+import ScheduleManager.Models.Schedule;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+
 import java.net.URL;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.ZoneId;
+import java.sql.*;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class LoginController extends Controller {
     public Button loginExit;
@@ -100,6 +107,52 @@ public class LoginController extends Controller {
                 if (loginPasswordField.getText().equals(password)) {        //insecure, should be checked on database if you don't trust the client
                     Controller c = new GuiController(userName);
                     loadScene(c, event, "ScheduleManager/Views/gui.fxml", 900, 475, bundle);
+
+                    int userID = DatabaseQueryHelper.getUserID(userName);
+
+                    AtomicBoolean upcomingAppt = new AtomicBoolean(false);
+                    //check for upcoming appointment in next 15 minutes
+
+                    //create new Schedule object with just the customer's appointments
+                    Schedule userSchedule = new Schedule();
+                    DatabaseQueryHelper.getUserAppointments(userSchedule, userID);
+
+                    //Extract appointments from schedule object
+                    ObservableList<Appointment> userAppointments = userSchedule.getAllAppointments();
+                    AtomicReference<Appointment> upcoming = null;
+
+                    //add the local time offset
+                    LocalDateTime dt = LocalDateTime.now();
+                    ZoneId zone = ZoneId.systemDefault();
+                    ZonedDateTime zdt = dt.atZone(zone);
+                    ZoneOffset offset = zdt.getOffset();
+                    Timestamp currentTime = Timestamp.valueOf(dt.minus(offset.getTotalSeconds(), ChronoUnit.SECONDS));
+                    Timestamp currentPlusFifteen = Timestamp.valueOf(dt.minus(offset.getTotalSeconds() -900 , ChronoUnit.SECONDS));
+
+                    //check if any of the user's appointments' start times are in the next 15 minutes
+                    userAppointments.forEach(appointment -> {
+                        if(appointment.getStart().after(currentTime)){
+                            if(appointment.getStart().before(currentPlusFifteen)){
+                                Alert a = new Alert(Alert.AlertType.INFORMATION);
+                                Timestamp start = appointment.getStart();
+                                start = Timestamp.valueOf(start.toLocalDateTime().plus(offset.getTotalSeconds(), ChronoUnit.SECONDS));      //offset database time to local user time
+                                a.setContentText("There is an upcoming appointment for you: \n Appointment ID: " + appointment.getId() + "\n Appointment Date: " + start);
+                                a.show();
+                                upcomingAppt.set(true);
+                                return;
+                            }
+                        }
+                    });
+
+
+                    if(upcomingAppt.get()){
+                    } else {
+                        Alert a = new Alert(Alert.AlertType.INFORMATION);
+                        a.setContentText("No upcoming appointments for you.");
+                        a.show();
+                    }
+
+
 
 
                 } else {

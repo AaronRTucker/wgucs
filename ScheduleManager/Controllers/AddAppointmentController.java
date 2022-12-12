@@ -7,13 +7,14 @@
 package ScheduleManager.Controllers;
 
 import ScheduleManager.DBHelper.DatabaseQueryHelper;
+import ScheduleManager.Models.Appointment;
+import ScheduleManager.Models.Schedule;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AddAppointmentController extends Controller {
 
@@ -251,11 +253,11 @@ public class AddAppointmentController extends Controller {
                     a.setContentText("Date Fields must not be empty");
                     a.show();
                 }else{
-                    //Input is good
+                    //User input is good
 
                     //Need to change datetime to UTC - done, test this
-                    //Need to check if the app end time is after the start time
-                    //Need to check if the app start and end time is between business hours EST time
+                    //Need to check if the app end time is after the start time - done, test this
+                    //Need to check if the app start and end time is between business hours EST time  - done, test this
                     //Need to make sure schedules don't overlap
 
 
@@ -279,7 +281,7 @@ public class AddAppointmentController extends Controller {
 
 
 
-                    //check if end time is after start time
+                    //check if end time is after start time or not during business hours
 
                     ZoneId eastern = ZoneId.of("US/Eastern");
                     ZonedDateTime edt = selectedStart.toLocalDateTime().atZone(eastern);
@@ -297,8 +299,40 @@ public class AddAppointmentController extends Controller {
                     String easternEndHour = sdf.format(calendar.getTime());
                     int easternEndInt = Integer.parseInt(easternEndHour);
 
-                    System.out.println(easternStartInt);
-                    System.out.println(easternEndInt);
+                    AtomicBoolean conflict = new AtomicBoolean(false);
+                    //check for overlapping appointment
+
+                    //create new Schedule object with just the customer's appointments
+                    Schedule customerSchedule = new Schedule();
+                    DatabaseQueryHelper.getCustomerAppointments(customerSchedule, selectedCustomerID);
+
+                    //Extract appointments from schedule object
+                    ObservableList<Appointment> customerAppointments = customerSchedule.getAllAppointments();
+
+                    //check if start time equals or is during an existing appointment
+                    customerAppointments.forEach(appointment -> {
+                        if(selectedStart.equals(appointment.getStart())){   //check edges
+                            conflict.set(true);
+                        }
+                        if(selectedStart.equals(appointment.getEnd())){   //check edges
+                            conflict.set(true);
+                        }
+                        if(selectedEnd.equals(appointment.getStart())){   //check edges
+                            conflict.set(true);
+                        }
+                        if(selectedEnd.equals(appointment.getEnd())){     //check edges
+                            conflict.set(true);
+                        }
+                        if (selectedStart.after( appointment.getStart()) && selectedStart.before(appointment.getEnd())){    //check middle
+                            conflict.set(true);
+                        }
+                        if (selectedEnd.after( appointment.getStart()) && selectedEnd.before(appointment.getEnd())){    //check middle
+                            conflict.set(true);
+                        }
+                    });
+
+                    //System.out.println(easternStartInt);
+                    //System.out.println(easternEndInt);
 
                     if(selectedStart.after(selectedEnd)){
                         Alert a = new Alert(Alert.AlertType.ERROR);
@@ -312,12 +346,23 @@ public class AddAppointmentController extends Controller {
                         Alert a = new Alert(Alert.AlertType.ERROR);
                         a.setContentText("End time must be before 10PM EST");
                         a.show();
-                    }  else {
+                    } else if(conflict.get()){
+                        Alert a = new Alert(Alert.AlertType.ERROR);
+                        a.setContentText("Appointment time conflicts with an existing appointment time for this customer");
+                        a.show();
+                    }
+                    else {
                         DatabaseQueryHelper.addAppointment(id, title, description, location, selectedContactId, type, selectedStart, selectedEnd, selectedUserID, selectedCustomerID, userName);
                         addAppointmentCancelPressed(event);        //return to home screen if there are no errors
                     }
 
-                    System.out.println(selectedStart);
+
+
+
+                    //check if times overlap
+
+
+                    //System.out.println(selectedStart);
 
                 }
             } catch (Exception e) {

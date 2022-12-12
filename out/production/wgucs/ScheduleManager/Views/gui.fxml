@@ -55,5 +55,6 @@
    <Label fx:id="localTime" layoutX="123.0" layoutY="367.0" text="LocalTime" />
    <Label fx:id="easternTime" layoutX="122.0" layoutY="385.0" text="EST" />
    <Label fx:id="universalTime" layoutX="121.0" layoutY="403.0" text="UTC" />
+   <Button fx:id="reportsButton" layoutX="386.0" layoutY="433.0" mnemonicParsing="false" onAction="#reportsButtonPressed" text="Reports" />
 
 </AnchorPane>

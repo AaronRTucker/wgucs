@@ -116,6 +116,62 @@ public abstract class DatabaseQueryHelper {
         }
     }
 
+    public static void getCustomerAppointments(Schedule customerSchedule, int customerID){
+        try {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`appointments` WHERE Customer_ID = " + customerID + ";");
+            ResultSet result = ps.executeQuery();
+            while (result.next()) {
+                int contactID = result.getInt("Contact_ID");
+                String contactName = getContactName(contactID);
+                Appointment a = new Appointment(
+
+                        result.getInt("Appointment_ID"),
+                        result.getString("Title"),
+                        result.getString("Description"),
+                        result.getString("Location"),
+                        result.getString("Type"),
+                        result.getTimestamp("Start"),
+                        result.getTimestamp("End"),
+                        result.getInt("Customer_ID"),
+                        result.getInt("User_ID"),
+                        contactName
+                );
+                customerSchedule.addAppointment(a);
+            }
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void getUserAppointments(Schedule userSchedule, int userID){
+        try {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`appointments` WHERE User_ID = " + userID + ";");
+            ResultSet result = ps.executeQuery();
+            while (result.next()) {
+                int contactID = result.getInt("Contact_ID");
+                String contactName = getContactName(contactID);
+                Appointment a = new Appointment(
+
+                        result.getInt("Appointment_ID"),
+                        result.getString("Title"),
+                        result.getString("Description"),
+                        result.getString("Location"),
+                        result.getString("Type"),
+                        result.getTimestamp("Start"),
+                        result.getTimestamp("End"),
+                        result.getInt("Customer_ID"),
+                        result.getInt("User_ID"),
+                        contactName
+                );
+                userSchedule.addAppointment(a);
+            }
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
     public static String getContactName (int contactID){
 
         //Get contact name from database
@@ -355,6 +411,21 @@ public abstract class DatabaseQueryHelper {
         }
 
         return userIDs;
+    }
+
+    public static int getUserID(String userName){
+        //Get division ID from selected division name
+        try {
+            PreparedStatement ps = JDBC.connection.prepareStatement("SELECT * FROM `client_schedule`.`users` WHERE User_Name = '" + userName + "';");
+            ResultSet result = ps.executeQuery();
+            if (result.next()) {
+                return result.getInt("User_ID");
+            }
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return -1;      //something went wrong
     }
 
     public static ArrayList<Integer> getCustomerIDs(){
