@@ -143,8 +143,8 @@ public class AddAppointmentController extends Controller {
 
 
         //populate the contact combo box
-        for (String country : contacts) {
-            contactDropdown.getItems().addAll(country);
+        for (String contact : contacts) {
+            contactDropdown.getItems().addAll(contact);
         }
 
         //populate the userID combo box

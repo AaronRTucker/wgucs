@@ -5,6 +5,7 @@
 
 package ScheduleManager.Models;
 
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -110,6 +111,17 @@ public class Schedule {
      */
     public ObservableList<Appointment> getAllAppointments(){
         return allAppointments;
+    }
+
+    public ObservableList<Appointment> getContactsAppointments(String contact){
+        ObservableList<Appointment> contactsAppts= FXCollections.observableArrayList();
+
+        for (Appointment allAppointment : this.allAppointments) {
+            if (allAppointment.getContact().equals(contact)) {
+                contactsAppts.add(allAppointment);
+            }
+        }
+        return contactsAppts;
     }
 }
 

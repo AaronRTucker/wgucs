@@ -36,7 +36,7 @@
 
     <TextField fx:id="CustomerSearchTextField" layoutX="244.0" layoutY="86.0" onKeyTyped="#CustomerSearchKeyTyped" promptText="Search by customer ID or Name" />
     <TextField fx:id="AppointmentSearchTextField" layoutX="682.0" layoutY="86.0" onKeyTyped="#AppointmentSearchKeyTyped" promptText="Search by appointment ID or Name" />
-    <Button fx:id="exitBtn" layoutX="701.0" layoutY="350.0" mnemonicParsing="false" onAction="#pressExitButton" text="Exit" />
+    <Button fx:id="exitBtn" layoutX="701.0" layoutY="433.0" mnemonicParsing="false" onAction="#pressExitButton" text="Exit" />
     <Button fx:id="addCustomerBtn" layoutX="244.0" layoutY="311.0" mnemonicParsing="false" onAction="#addCustomerButtonPressed" text="Add" />
     <Button fx:id="addAppointmentBtn" layoutX="682.0" layoutY="311.0" mnemonicParsing="false" onAction="#addAppointmentButtonPressed" text="Add" />
     <Button fx:id="modCustomerBtn" layoutX="292.0" layoutY="311.0" mnemonicParsing="false" onAction="#modifyCustomerButton" text="Modify" />

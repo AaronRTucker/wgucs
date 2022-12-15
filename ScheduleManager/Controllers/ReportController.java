@@ -7,30 +7,26 @@
 package ScheduleManager.Controllers;
 
 import ScheduleManager.DBHelper.DatabaseQueryHelper;
-import ScheduleManager.DBHelper.JDBC;
 import ScheduleManager.Models.Appointment;
 import ScheduleManager.Models.Customer;
 import ScheduleManager.Models.Schedule;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyEvent;
 
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.time.LocalDate;
+import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.WeekFields;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class ReportController extends Controller {
@@ -39,7 +35,7 @@ public class ReportController extends Controller {
     private ResourceBundle bundle;
     private final Schedule schedule;
 
-    private int selectedContactId;
+    private String  selectedContact;
 
     private final String userName;    //name to store in database associating which user added this customer
 
@@ -68,14 +64,21 @@ public class ReportController extends Controller {
     @FXML private TableColumn<Appointment, String> AppointmentEndCol;
     @FXML private TableColumn<Schedule, Integer> AppointmentCustomerIdCol;
 
+    //Months table columns
+    @FXML private TableColumn<MonthTotal, Integer> YearCol;
+    @FXML private TableColumn<MonthTotal, String> MonthCol;
+    @FXML private TableColumn<MonthTotal, Integer> MonthNumbersCol;
+
+
+    //Types table columns
+    @FXML private TableColumn<MonthTotal, String> TypeCol;
+    @FXML private TableColumn<MonthTotal, Integer> TypeNumbersCol;
+
     @FXML private Button cancelButton;
 
     @FXML public ComboBox<String> contactDropdown;
 
-
-
-
-
+    Report report;
 
 
     //Constructor for new Controller object
@@ -86,12 +89,6 @@ public class ReportController extends Controller {
 
 
     //LOGIN EVENT HANDLERS
-
-
-
-
-
-
 
     /**
      * Called every time a screen is loaded
@@ -120,6 +117,14 @@ C.  Write code that provides the ability to track user activity by recording all
          */
         bundle = resourceBundle;
 
+        contactDropdown.setPromptText("Select a contact");
+        //Get contacts list from database
+        ArrayList<String> contacts = DatabaseQueryHelper.getContacts();
+
+        //populate the contact combo box
+        for (String contact : contacts) {
+            contactDropdown.getItems().addAll(contact);
+        }
 
         //Change default table placeholder messages
         MonthsTable.setPlaceholder(new Label("Months list is empty"));
@@ -130,8 +135,24 @@ C.  Write code that provides the ability to track user activity by recording all
         //Get appointment table data from MYSQL database
         DatabaseQueryHelper.getAllAppointments(schedule);
 
+        //Process the schedule data into a report object
+        report = new Report();
+
+        ObservableList<Appointment> appointments = schedule.getAllAppointments();
+        for (Appointment appointment : appointments) {
+            Timestamp start = appointment.getStart();
+            int year = start.getYear() + 1900;
+            int month = start.getMonth();
+            report.addMonth(year, month);
+            report.addType(appointment.getType());
+        }
+
         //populate the table with Appointments data from the schedule
-        populateAppointmentsTable();
+        //populateAppointmentsTable();
+
+        populateMonthsTable();
+
+        populateTypesTable();
 
     }
 
@@ -152,11 +173,12 @@ C.  Write code that provides the ability to track user activity by recording all
      */
     @FXML
     public void contactBoxPressed(ActionEvent event) {
-        String selectedContact = contactDropdown.getValue();
-
-        //Get contact ID from selected contact name
-        selectedContactId = DatabaseQueryHelper.getContactID(selectedContact);
+        selectedContact = contactDropdown.getValue();
+        System.out.println(contactDropdown.getValue());
+        populateAppointmentsTable();
     }
+
+
 
 
 
@@ -187,60 +209,155 @@ C.  Write code that provides the ability to track user activity by recording all
             return Bindings.createStringBinding(() -> "" + endTime.toLocalDateTime().plus(offset.getTotalSeconds(), ChronoUnit.SECONDS) + " " + ZoneId.systemDefault());
         });
         AppointmentCustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
-        AppointmentsTable.setItems(schedule.getAllAppointments());
+        AppointmentsTable.setItems(schedule.getContactsAppointments(selectedContact));
+        AppointmentsTable.refresh();
     }
 
 
-    private class MonthTotal{
+    private void populateMonthsTable(){
+        YearCol.setCellValueFactory(new PropertyValueFactory<>("year"));
+        MonthCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        MonthNumbersCol.setCellValueFactory(new PropertyValueFactory<>("total"));
+        MonthsTable.setItems(report.getAllMonthTotals());
+    }
+
+    private void populateTypesTable() {
+        TypeCol.setCellValueFactory(new PropertyValueFactory<>("typeName"));
+        TypeNumbersCol.setCellValueFactory(new PropertyValueFactory<>("typeTotal"));
+        TypesTable.setItems(report.getAllTypeTotals());
+    }
+
+
+
+    protected class MonthTotal{
+
+
+        private int year;
         private int month;
+        private String[] names = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        private String name;
         private int total;
 
-        MonthTotal(int month, int total){
+        private MonthTotal(int year, int month){
+            this.year = year;
             this.month = month;
-            this.total = total;
+            this.name = names[month-1];
+            this.total = 1;
         }
 
+        public void addOne(){
+            total++;
+        }
+        
+        public String getName(){
+            return this.name;
+        }
+
+        public int getYear() {
+            return this.year;
+        }
 
         public int getMonth() {
-            return month;
-        }
-
-        public void setMonth(int month) {
-            this.month = month;
+            return this.month;
         }
 
         public int getTotal() {
-            return total;
-        }
-
-        public void setTotal(int total) {
-            this.total = total;
+            return this.total;
         }
     }
 
-    private class TypeTotal{
-        private String type;
-        private int total;
+    protected class TypeTotal{
 
-        public TypeTotal(String type, int total) {
-            this.type = type;
-            this.total = total;
+        public String getTypeName() {
+            return typeName;
         }
 
-        public String getType() {
-            return type;
+        public int getTypeTotal() {
+            return typeTotal;
         }
 
-        public void setType(String type) {
-            this.type = type;
+        private String typeName;
+        private int typeTotal;
+
+        private TypeTotal(String name){
+            this.typeName = name;
+            typeTotal = 1;
         }
 
-        public int getTotal() {
-            return total;
+        public void addOne(){
+            typeTotal++;
+        }
+    }
+    
+    
+    private class Report{
+        private final ObservableList<MonthTotal> allMonths;
+        private final ObservableList<TypeTotal> allTypes;
+
+        public Report(){
+            allMonths = FXCollections.observableArrayList();
+            allTypes = FXCollections.observableArrayList();
+        }
+        
+        public void addMonth(int year, int month){
+            if(checkMonthTotal(year,month)) {
+                returnMonthTotal(year, month).addOne();
+            } else {
+                allMonths.add(new MonthTotal(year,month));
+            }
         }
 
-        public void setTotal(int total) {
-            this.total = total;
+        public boolean checkMonthTotal(int year, int month){
+            for (MonthTotal monthTotal : this.allMonths) {
+                if (monthTotal.getMonth() == month) {
+                    if(monthTotal.getYear() == year){
+                        return true;
+                    }
+                }
+            }
+            return false;    //no month found
+        }
+        public MonthTotal returnMonthTotal(int year, int month){
+            for (MonthTotal monthTotal : this.allMonths) {
+                if (monthTotal.getMonth() == month) {
+                    if(monthTotal.getYear() == year){
+                        return monthTotal;
+                    }
+                }
+            }
+            return null;    //no month found
+        }
+
+        public void addType(String name){
+            if(checkTypeTotal(name)) {
+                returnTypeTotal(name).addOne();
+            } else {
+                allTypes.add(new TypeTotal(name));
+            }
+        }
+
+        public boolean checkTypeTotal(String name){
+            for (TypeTotal typeTotal : this.allTypes) {
+                if (typeTotal.getTypeName().equals(name)){
+                    return true;
+                }
+            }
+            return false;    //no type found
+        }
+        public TypeTotal returnTypeTotal(String name){
+            for (TypeTotal typeTotal : this.allTypes) {
+                if (typeTotal.getTypeName().equals(name)){
+                    return typeTotal;
+                }
+            }
+            return null;    //no type found
+        }
+
+        public ObservableList<MonthTotal> getAllMonthTotals(){
+            return allMonths;
+        }
+        public ObservableList<TypeTotal> getAllTypeTotals(){
+            return allTypes;
         }
     }
 }

@@ -6,6 +6,7 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="472.0" prefWidth="854.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
     <TableView fx:id="MonthsTable" layoutX="15.0" layoutY="111.0" prefHeight="106.0" prefWidth="178.0">
         <columns>
+            <TableColumn fx:id="YearCol" prefWidth="35.80005168914795" text="Year" />
             <TableColumn fx:id="MonthCol" prefWidth="65.80005168914795" text="Month" />
             <TableColumn fx:id="MonthNumbersCol" prefWidth="102.7999267578125" text="Total number" />
 
@@ -28,10 +29,10 @@
 
     <TableView fx:id="AppointmentsTable" layoutX="163.0" layoutY="260.0" prefHeight="166.0" prefWidth="674.0">
         <columns>
+            <TableColumn fx:id="AppointmentContactCol" prefWidth="67.7999267578125" text="Contact" />
             <TableColumn fx:id="AppointmentIdCol" prefWidth="107.5999755859375" text="Appointment ID" />
             <TableColumn fx:id="AppointmentTitleCol" prefWidth="52.0" text="Title" />
             <TableColumn fx:id="AppointmentDescriptionCol" prefWidth="70.199951171875" text="Description" />
-            <TableColumn fx:id="AppointmentContactCol" prefWidth="67.7999267578125" text="Contact" />
             <TableColumn fx:id="AppointmentTypeCol" prefWidth="60.7999267578125" text="Type" />
             <TableColumn fx:id="AppointmentStartCol" prefWidth="68.0" text="Start" />
             <TableColumn fx:id="AppointmentEndCol" text="End" />
