@@ -38,6 +38,7 @@ public abstract class Controller implements Initializable {
 
 
 
+
     //Constructor for new Controller object
     public Controller(){
 
@@ -53,10 +54,15 @@ public abstract class Controller implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        localTime.setText((String)LocalDateTime.now().toString());
+        localTime.setText(LocalDateTime.now().toString());
     }
 
 
+    /**
+     * Set return controller.
+     *
+     * @param c the controller to return
+     */
     public void setReturnController(Controller c){
     }
 
@@ -66,6 +72,9 @@ public abstract class Controller implements Initializable {
      * @param event  the action event
      * @param width  the width of the scene
      * @param height the height of the scene
+     * @param controller the controller being passed in
+     * @param location the absolute reference for file path of scene
+     * @param bundle the resource bundle being passed in
      */
     //Private helper function
     //Handle switching between fxml file scenes
@@ -83,6 +92,9 @@ public abstract class Controller implements Initializable {
     }
 
 
+    /**
+     * Init clocks with proper timezone offsets and labels.
+     */
     protected void initClocks() {
 
         Timeline localClock = new Timeline(new KeyFrame(Duration.ZERO, e -> {

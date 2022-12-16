@@ -155,7 +155,7 @@ public class Appointment {
     }
 
     /**
-     * @return ObservableList<Customer> the list of associated customers
+     * @return ObservableList the list of associated customers
      */
     public ObservableList<Customer> getAllAssociatedCustomers(){
         return this.associatedCustomers;

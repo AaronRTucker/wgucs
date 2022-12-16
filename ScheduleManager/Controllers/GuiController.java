@@ -194,7 +194,7 @@ public class GuiController extends Controller {
     @FXML
     public void addCustomerButtonPressed(ActionEvent event){
         AddCustomerController c = new AddCustomerController(nextCustomerId, userName);
-        loadScene(c, event, "ScheduleManager/Views/addCustomer.fxml", 900, 475, bundle);
+        loadScene(c, event, "ScheduleManager/Views/addCustomer.fxml", 1000, 475, bundle);
 
     }
 
@@ -221,6 +221,11 @@ public class GuiController extends Controller {
         }
     }
 
+    /**
+     * Week radio pressed event handler
+     *
+     * @param event the event
+     */
     @FXML
     public void weekRadioPressed(ActionEvent event){
         weekSelected = true;
@@ -233,6 +238,11 @@ public class GuiController extends Controller {
         dateFilter.setValue(temp);
     }
 
+    /**
+     * Month radio pressed event handler
+     *
+     * @param event the event
+     */
     @FXML
     public void monthRadioPressed(ActionEvent event){
         weekSelected = false;
@@ -245,6 +255,11 @@ public class GuiController extends Controller {
         dateFilter.setValue(temp);
     }
 
+    /**
+     * Date filter pressed event handler
+     *
+     * @param event the event
+     */
     @FXML
     public void dateFilterPressed(ActionEvent event){
         LocalDate date = dateFilter.getValue(); // input from user
@@ -253,6 +268,12 @@ public class GuiController extends Controller {
         monthNumberSelected = date.getMonthValue();
     }
 
+
+    /**
+     * Reports button pressed event handler.
+     *
+     * @param event the event
+     */
     @FXML
     public void reportsButtonPressed(ActionEvent event){
         Controller c = new ReportController(userName);
@@ -399,6 +420,10 @@ public class GuiController extends Controller {
         CustomersTable.setItems(schedule.getAllCustomers());
     }
 
+
+    /**
+     * Populates the appointment table.  Lambda expressions used to functionally generate the correct object to return inline
+     */
     private void populateAppointmentsTable(){
         AppointmentIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         AppointmentTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -407,7 +432,7 @@ public class GuiController extends Controller {
         AppointmentContactCol.setCellValueFactory(new PropertyValueFactory<>("contact"));
         AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
         //AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<>("start"));     //replaced with timezone offset version below
-        AppointmentStartCol.setCellValueFactory(appt -> {
+        AppointmentStartCol.setCellValueFactory(appt -> {       //lambda expression used to functionally generate the correct object to return inline
             //Convert from UTC stored in the database to local timezone in the app
             Timestamp startTime = appt.getValue().getStart();
             ZoneId zone = ZoneId.systemDefault();
@@ -418,7 +443,7 @@ public class GuiController extends Controller {
 
 
         //AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<>("end")); //replaced with timezone offset version below
-        AppointmentEndCol.setCellValueFactory(appt -> {
+        AppointmentEndCol.setCellValueFactory(appt -> {   //lambda expression used to functionally generate the correct object to return inline
             //Convert from UTC stored in the database to local timezone in the app
             Timestamp endTime = appt.getValue().getEnd();
             ZoneId zone = ZoneId.systemDefault();
@@ -432,8 +457,12 @@ public class GuiController extends Controller {
     }
 
 
+    /**
+     * Sets up the customer table to be searched.  Lambda used to easily create that function inline
+     */
     private void setupCustomerTableSearch(){
         //Set up anonymous callback function for the event listener on the Customers search field
+        //Lambda expressions used to set up the search function inline
         filteredCustomers = new FilteredList<>(schedule.getAllCustomers(), p -> true);
         CustomerSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> filteredCustomers.setPredicate(Customer -> {
             if (newValue == null || newValue.isEmpty()) {
@@ -448,8 +477,12 @@ public class GuiController extends Controller {
         CustomersTable.setItems(sortedCustomersData);
     }
 
+    /**
+     * Sets up the appointment table to be searched.  Lambda used to easily create that function inline
+     */
     private void setupAppointmentTableSearch(){
         //Set up anonymous callback function for the event listener on the Appointments search field
+        //Lambda expressions used to set up the search function inline
         filteredAppointments = new FilteredList<>(schedule.getAllAppointments(), p -> true);
         AppointmentSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> filteredAppointments.setPredicate(Appointment -> {
             if (newValue == null || newValue.isEmpty()) {
@@ -467,17 +500,22 @@ public class GuiController extends Controller {
         AppointmentsTable.setItems(sortedAppointmentsData);
     }
 
+    /**
+     * Sets up the appointment table to be searched by date.  Lambda used to easily create that function inline
+     */
     private void setupAppointmentTableDateSearch(){
         //Set up anonymous callback function for the event listener on the Appointments date filter
+        //Lambda expressions used to set up the search function inline
         filteredAppointments = new FilteredList<>(schedule.getAllAppointments(), p -> true);
         dateFilter.valueProperty().addListener((observable, oldValue, newValue) -> filteredAppointments.setPredicate(Appointment -> {
                 if (newValue == null) {
                     return true;
                 }
-                LocalDate date = newValue; // input from user
+                //user has passed in a date to newValue
+                //LocalDate date = newValue; // input from user
                 Locale locale = Locale.getDefault();
-                weekNumberSelected = date.get(WeekFields.of(locale).weekOfWeekBasedYear());
-                monthNumberSelected = date.getMonthValue();
+                weekNumberSelected = newValue.get(WeekFields.of(locale).weekOfWeekBasedYear());
+                monthNumberSelected = newValue.getMonthValue();
 
                 if (weekSelected) {
                     LocalDate appStart = Appointment.getStart().toLocalDateTime().toLocalDate();

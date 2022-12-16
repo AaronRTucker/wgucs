@@ -24,7 +24,7 @@ public class Main extends Application{
     /**
      * Starts the GUI program and loads the opening stage
      * @param primaryStage the primary stage
-     * @throws Exception
+     * @throws Exception Throws exception when there is no gui.fxml to load
      */
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -42,7 +42,7 @@ public class Main extends Application{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Views/userLogin.fxml"), bundle);
             LoginController controller = new LoginController();
             loader.setController(controller);
-            Scene scene = new Scene((Pane)loader.load(), 600,375);
+            Scene scene = new Scene(loader.load(), 600,375);
             primaryStage.setScene(scene);
             primaryStage.show();
         } catch (Exception e){
@@ -53,7 +53,7 @@ public class Main extends Application{
 
     /**
      * Javadoc located in root folder of project zip file
-     * @param args
+     * @param args arguments to main
      */
     public static void main(String[] args) {
         launch(args);
