@@ -512,7 +512,6 @@ public class GuiController extends Controller {
                     return true;
                 }
                 //user has passed in a date to newValue
-                //LocalDate date = newValue; // input from user
                 Locale locale = Locale.getDefault();
                 weekNumberSelected = newValue.get(WeekFields.of(locale).weekOfWeekBasedYear());
                 monthNumberSelected = newValue.getMonthValue();
