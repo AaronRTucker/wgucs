@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="648.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+    <Label layoutX="31.0" layoutY="36.0" text="%AddAppointment" />
+    <Button fx:id="cancel" layoutX="774.0" layoutY="609.0" mnemonicParsing="false" onAction="#modifyAppointmentCancelPressed" text="Cancel" />
+    <Label layoutX="261.0" layoutY="178.0" text="%ID" />
+    <Label layoutX="257.0" layoutY="213.0" text="%Title" />
+    <Label layoutX="235.0" layoutY="251.0" text="%Description" />
+    <Label layoutX="244.0" layoutY="288.0" text="%Location" />
+    <Label layoutX="246.0" layoutY="326.0" text="%Contact" />
+    <Label layoutX="254.0" layoutY="365.0" text="%Type" />
+    <TextField fx:id="appointmentIdField" layoutX="349.0" layoutY="174.0" />
+    <TextField fx:id="appointmentTitleField" layoutX="349.0" layoutY="209.0" />
+    <TextField fx:id="appointmentDescField" layoutX="349.0" layoutY="247.0" prefHeight="26.0" prefWidth="286.0" />
+    <TextField fx:id="appointmentLocationField" layoutX="349.0" layoutY="284.0" prefHeight="25.0" prefWidth="77.0" />
+    <TextField fx:id="appointmentTypeField" layoutX="349.0" layoutY="361.0" prefHeight="25.0" prefWidth="77.0" />
+    <Button fx:id="save" layoutX="681.0" layoutY="609.0" mnemonicParsing="false" onAction="#modifyAppointmentSavePressed" text="%Save" />
+    <ComboBox fx:id="contactDropdown" layoutX="349.0" layoutY="322.0" onAction="#contactBoxPressed" prefWidth="150.0" />
+    <DatePicker fx:id="startDateSelect" layoutX="349.0" layoutY="399.0" onAction="#startDatePressed" />
+    <Label layoutX="254.0" layoutY="403.0" text="%Start" />
+    <Label layoutX="257.0" layoutY="437.0" text="%End" />
+    <DatePicker fx:id="endDateSelect" layoutX="349.0" layoutY="433.0" onAction="#endDatePressed" />
+    <Label layoutX="234.0" layoutY="470.0" text="%CustomerID" />
+    <Label layoutX="247.0" layoutY="503.0" text="%UserID" />
+    <ComboBox fx:id="customerIdDropdown" layoutX="349.0" layoutY="466.0" onAction="#customerIDBoxPressed" prefWidth="150.0" />
+    <ComboBox fx:id="userIdDropdown" layoutX="349.0" layoutY="499.0" onAction="#userIDBoxPressed" prefWidth="150.0" />
+    <Label layoutX="554.0" layoutY="374.0" text="%Hour" />
+    <Label layoutX="662.0" layoutY="374.0" text="%Minute" />
+    <ComboBox fx:id="startHourBox" layoutX="542.0" layoutY="398.0" onAction="#startHourPressed" prefHeight="26.0" prefWidth="78.0" />
+    <ComboBox fx:id="startMinuteBox" layoutX="642.0" layoutY="398.0" onAction="#startMinutePressed" prefHeight="26.0" prefWidth="78.0" />
+    <ComboBox fx:id="endHourBox" layoutX="542.0" layoutY="433.0" onAction="#endHourPressed" prefHeight="26.0" prefWidth="78.0" />
+    <ComboBox fx:id="endMinuteBox" layoutX="642.0" layoutY="433.0" onAction="#endMinutePressed" prefHeight="26.0" prefWidth="78.0" />
+
+    <Label layoutX="247.0" layoutY="544.0" text="%YourLocalTime" />
+    <Label layoutX="247.0" layoutY="562.0" text="%OfficeTime" />
+    <Label layoutX="247.0" layoutY="580.0" text="%UTCTime" />
+    <Label fx:id="localTime" layoutX="360.0" layoutY="544.0" text="%LocalTime" />
+    <Label fx:id="easternTime" layoutX="359.0" layoutY="562.0" text="EST" />
+    <Label fx:id="universalTime" layoutX="358.0" layoutY="580.0" text="UTC" />
+</AnchorPane>
