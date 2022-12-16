@@ -13,7 +13,6 @@ import ScheduleManager.Models.Customer;
 import ScheduleManager.Models.Schedule;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -21,7 +20,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
-import javafx.util.Callback;
 
 import java.net.URL;
 import java.sql.Timestamp;
@@ -42,8 +40,6 @@ public class GuiController extends Controller {
     private int nextAppointmentId;
     private Customer selectedCustomer;
     private Appointment selectedAppointment;
-
-    //maintain list of temporary associated Customers
 
 
     //filtered Customers and Appointments list used in searches
@@ -118,17 +114,12 @@ public class GuiController extends Controller {
     public GuiController(String userName){
         this.userName = userName;
         this.nextCustomerId = 1;
-        this.schedule = new Schedule();                                             //schedule object passed in from Main
+        this.schedule = new Schedule();     //schedule object passed in from Main
 
     }
 
 
     //LOGIN EVENT HANDLERS
-
-
-
-
-
 
 
     /**
@@ -139,23 +130,6 @@ public class GuiController extends Controller {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        //Need to alert user if there is an appt within 15 minutes from current time
-
-
-        //Need to create a report button that generates info
-
-        /*Write code that generates accurate information in each of the following reports and will display the reports in the user interface:
-Note: You do not need to save and print the reports to a file or provide a screenshot.
-•  the total number of customer appointments by type and month
-
-•  a schedule for each contact in your organization that includes appointment ID, title, type and description, start date and time, end date and time, and customer ID
-
-•  an additional report of your choice that is different from the two other required reports in this prompt and from the user log-in date and time stamp that will be tracked in part C
-B.  Write at least two different lambda expressions to improve your code.
-C.  Write code that provides the ability to track user activity by recording all user log-in attempts, dates, and time stamps and whether each attempt was successful in a file named login_activity.txt. Append each new record to the existing file, and save to the root folder of the application.
-
-
-         */
 
         initClocks();
 
@@ -168,8 +142,9 @@ C.  Write code that provides the ability to track user activity by recording all
 
 
         //Change default table placeholder messages
-        CustomersTable.setPlaceholder(new Label("Customers list is empty"));
-        AppointmentsTable.setPlaceholder(new Label("Appointments list is empty"));
+        CustomersTable.setPlaceholder(new Label(bundle.getString("CustomersListIsEmpty")));
+        AppointmentsTable.setPlaceholder(new Label(bundle.getString("AppointmentsListIsEmpty")));
+
 
         //Get customer table data from MYSQL database
         DatabaseQueryHelper.getAllCustomers(schedule);
@@ -238,7 +213,7 @@ C.  Write code that provides the ability to track user activity by recording all
         Alert a;
         if(selectedCustomer == null){
             a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Please select a Customer to modify");
+            a.setContentText(bundle.getString("PleaseSelectACustomerToModify"));
             a.show();
         } else {
             ModifyCustomerController c = new ModifyCustomerController(userName, selectedCustomer);
@@ -276,8 +251,6 @@ C.  Write code that provides the ability to track user activity by recording all
         Locale locale = Locale.getDefault();
         weekNumberSelected = date.get(WeekFields.of(locale).weekOfWeekBasedYear());
         monthNumberSelected = date.getMonthValue();
-        //System.out.println(weekNumberSelected);
-        //System.out.println(monthNumberSelected);
     }
 
     @FXML
@@ -293,20 +266,19 @@ C.  Write code that provides the ability to track user activity by recording all
     @FXML
     public void deleteCustomerButton(ActionEvent event)
     {
-        //Need to add code that deletes all customer appointments
         selectedCustomer = CustomersTable.getSelectionModel().getSelectedItem();
         Alert a;
         Optional<ButtonType> result;
         //Handle the error where no Customer is selected
         if(selectedCustomer == null){
             a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Please select a Customer to delete");
+            a.setContentText(bundle.getString("PleaseSelectACustomerToDelete"));
             a.show();
         } else {
             a = new Alert(Alert.AlertType.CONFIRMATION);
-            a.setTitle("Customer deletion");
-            a.setHeaderText("You are about to delete Customer: " + selectedCustomer.getName() + " and all of their appointments.");
-            a.setContentText("Are you sure you want to do this?");
+            a.setTitle(bundle.getString("CustomerDeletion"));
+            a.setHeaderText(bundle.getString("YouAreAboutToDelete") +": " + selectedCustomer.getName() + " " + bundle.getString("AndAllOfTheirAppointments"));
+            a.setContentText(bundle.getString("AreYouSureYouWantToDoThis"));
             result = a.showAndWait();
             if(result.isPresent()) {
                 if (result.get() == ButtonType.OK) {
@@ -342,7 +314,7 @@ C.  Write code that provides the ability to track user activity by recording all
         selectedAppointment = AppointmentsTable.getSelectionModel().getSelectedItem();
         if(selectedAppointment == null){
             a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Please select a Appointment to modify");
+            a.setContentText(bundle.getString("PleaseSelectAnAppointmentToModify"));
             a.show();
         } else {
             ModifyAppointmentController c = new ModifyAppointmentController(userName, selectedAppointment);
@@ -363,14 +335,14 @@ C.  Write code that provides the ability to track user activity by recording all
         //Handle the error where no Appointment is selected
         if(selectedAppointment == null){
             a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Please select an Appointment to delete");
+            a.setContentText(bundle.getString("PleaseSelectAnAppointmentToDelete"));
             a.show();
             //Handle the error where an Appointment has associate Customers still
         }else{  //everything is checked, just need to confirm deletion
             a = new Alert(Alert.AlertType.CONFIRMATION);
-            a.setTitle("Appointment deletion");
-            a.setHeaderText("You are about to delete Appointment: " + selectedAppointment.getTitle());
-            a.setContentText("Are you sure you want to do this?");
+            a.setTitle(bundle.getString("AppointmentDeletion"));
+            a.setHeaderText(bundle.getString("YouAreAboutToDelete")+ ": " + selectedAppointment.getTitle());
+            a.setContentText(bundle.getString("AreYouSureYouWantToDoThis"));
             result = a.showAndWait();
             if(result.isPresent()){
                 if (result.get() == ButtonType.OK) {
@@ -392,10 +364,10 @@ C.  Write code that provides the ability to track user activity by recording all
     public void CustomerSearchKeyTyped(KeyEvent event){
         if(!CustomerSearchTextField.getText().isEmpty()){   //if there is something typed in the search box
             if(filteredCustomers.size() == 0){              //and there are no results
-                CustomersTable.setPlaceholder(new Label("Nothing found in Customers search"));
+                CustomersTable.setPlaceholder(new Label(bundle.getString("NothingFoundInCustomersSearch")));
             }
         } else {  //there is something in the search box but no content
-            CustomersTable.setPlaceholder(new Label("Customers list is empty"));
+            CustomersTable.setPlaceholder(new Label("CustomersListIsEmpty"));
         }
     }
 
@@ -408,10 +380,10 @@ C.  Write code that provides the ability to track user activity by recording all
     public void AppointmentSearchKeyTyped(KeyEvent event){
         if(!AppointmentSearchTextField.getText().isEmpty()){
             if(filteredAppointments.size() == 0){
-                AppointmentsTable.setPlaceholder(new Label("Nothing found in Appointments search"));
+                AppointmentsTable.setPlaceholder(new Label(bundle.getString("NothingFoundInAppointmentsSearch")));
             }
         } else {
-            AppointmentsTable.setPlaceholder(new Label("Appointments list is empty"));
+            AppointmentsTable.setPlaceholder(new Label(bundle.getString("AppointmentsListIsEmpty")));
         }
     }
 
@@ -487,7 +459,7 @@ C.  Write code that provides the ability to track user activity by recording all
 
             //if search text equals Appointment ID or name
             return Appointment.getTitle().toLowerCase().contains(lowerCaseFilter) || lowerCaseFilter.equals(String.valueOf(Appointment.getId())); // Filter matches title or ID.
-// Filter doesn't match.
+            // Filter doesn't match.
         }));
 
         SortedList<Appointment> sortedAppointmentsData = new SortedList<>(filteredAppointments);

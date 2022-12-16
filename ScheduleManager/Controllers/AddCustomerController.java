@@ -64,7 +64,7 @@ public class AddCustomerController extends Controller {
         CustomerIdField.setEditable(false);
         CustomerIdField.setText(String.valueOf(this.nextCustomerId));
 
-        countryComboBox.setPromptText("Select a country");
+        countryComboBox.setPromptText(bundle.getString("SelectACountry"));
 
 
         //Get countries list from database
@@ -77,7 +77,7 @@ public class AddCustomerController extends Controller {
         }
 
         //Set the default message for division box where country hasn't been selected yet
-        divisionComboBox.getItems().addAll("Select a Country first");
+        divisionComboBox.getItems().addAll(bundle.getString("SelectACountryFirst"));
 
     }
 
@@ -141,11 +141,11 @@ public class AddCustomerController extends Controller {
 
                 if (name.equals("") || address.equals("") || postalCode.equals("") || phoneNumber.equals("")) {
                     Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setContentText("Text Fields must not be empty");
+                    a.setContentText(bundle.getString("TextFieldsMustNotBeEmpty"));
                     a.show();
                 } else if(selectedDivisionID == -1){
                     Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setContentText("Please select a state");
+                    a.setContentText(bundle.getString("PleaseSelectAState"));
                     a.show();
                 } else {
                     //Input is good
@@ -156,7 +156,7 @@ public class AddCustomerController extends Controller {
                 }
             } catch (Exception e) {
                 Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setContentText("Inappropriate user input: " + e.getMessage());
+                a.setContentText(bundle.getString("InappropriateUserInput")+ ": " + e.getMessage());
                 a.show();
             }
         }

@@ -11,7 +11,6 @@ import ScheduleManager.Models.Appointment;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
 import java.sql.Timestamp;
@@ -24,13 +23,11 @@ public class ModifyAppointmentController extends Controller {
 
     //add appointment data fields
     public DatePicker startDateSelect;
-    public Button cancel;
     public TextField appointmentIdField;
     public TextField appointmentTitleField;
     public TextField appointmentDescField;
     public TextField appointmentLocationField;
     public TextField appointmentTypeField;
-    public Button save;
     public ComboBox<String> contactDropdown;
 
     public DatePicker endDateSelect;
@@ -41,8 +38,6 @@ public class ModifyAppointmentController extends Controller {
     public ComboBox<Integer> startMinuteBox;
     public ComboBox<Integer> endMinuteBox;
     private ResourceBundle bundle;
-
-    private int nextAppointmentId;
 
 
 
@@ -219,11 +214,11 @@ public class ModifyAppointmentController extends Controller {
 
                 if (title.equals("") || description.equals("") || location.equals("") || type.equals("") || selectedUserID==-1 || selectedContactId==-1 || selectedCustomerID==-1) {
                     Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setContentText("Input Fields must not be empty");
+                    a.setContentText(bundle.getString("InputFieldsMustNotBeEmpty"));
                     a.show();
                 }else if(selectedStart.after(selectedEnd)) {
                     Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setContentText("End time must be after start time");
+                    a.setContentText(bundle.getString("EndTimeMustBeAfterStartTime"));
                     a.show();
                 } else {
                     //Input is good
@@ -245,7 +240,7 @@ public class ModifyAppointmentController extends Controller {
                 }
             } catch (Exception e) {
                 Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setContentText("Inappropriate user input: " + e.getMessage());
+                a.setContentText(bundle.getString("InappropriateUserInput") +": " + e.getMessage());
                 a.show();
             }
         }

@@ -35,17 +35,13 @@ public class Main extends Application{
             ResourceBundle bundle = ResourceBundle.getBundle("ScheduleManager.Resources.language", currentLocale);
 
             JDBC.openConnection();
-            if(currentLocale.getLanguage() == "fr"){
-                primaryStage.setTitle("Gestionnaire d'Horaire");
-            } else {
-                primaryStage.setTitle("Schedule Manager");
-            }
+            primaryStage.setTitle(bundle.getString("ScheduleManager"));
+
             System.out.println(ZoneId.systemDefault());
             Schedule schedule = new Schedule();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Views/userLogin.fxml"), bundle);
             LoginController controller = new LoginController();
             loader.setController(controller);
-            //Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("gui.fxml")));
             Scene scene = new Scene((Pane)loader.load(), 600,375);
             primaryStage.setScene(scene);
             primaryStage.show();

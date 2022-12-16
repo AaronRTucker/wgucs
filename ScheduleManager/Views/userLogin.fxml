@@ -13,10 +13,10 @@
     <Label layoutX="123.0" layoutY="207.0" text="%Location" />
     <TextField fx:id="zoneID" editable="false" layoutX="209.0" layoutY="203.0" text="%Location" />
 
-    <Label layoutX="14.0" layoutY="282.0" text="Your local time" />
-    <Label layoutX="14.0" layoutY="300.0" text="Office Time" />
-    <Label layoutX="14.0" layoutY="318.0" text="UTC Time" />
-    <Label fx:id="localTime" layoutX="127.0" layoutY="282.0" text="LocalTime" />
+    <Label layoutX="14.0" layoutY="282.0" text="%YourLocalTime" />
+    <Label layoutX="14.0" layoutY="300.0" text="%OfficeTime" />
+    <Label layoutX="14.0" layoutY="318.0" text="%UTCTime" />
+    <Label fx:id="localTime" layoutX="127.0" layoutY="282.0" text="%LocalTime" />
     <Label fx:id="easternTime" layoutX="126.0" layoutY="300.0" text="EST" />
     <Label fx:id="universalTime" layoutX="125.0" layoutY="318.0" text="UTC" />
 </AnchorPane>

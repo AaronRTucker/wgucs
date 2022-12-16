@@ -16,18 +16,17 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class LoginController extends Controller {
-    public Button loginExit;
-    public Button loginSubmit;
     private ResourceBundle bundle;
 
     private String userName;
@@ -101,10 +100,22 @@ public class LoginController extends Controller {
                 a.setHeaderText(bundle.getString("Error"));
                 a.setContentText(bundle.getString("NoUserFound"));
                 a.show();
+
+                String filename= "loginActivityLog.txt";
+                FileWriter fw = new FileWriter(filename,true);  //set to true so data is appended to existing file
+                fw.write("Incorrect login attempt. User: " + userInputName +" at time: " + Timestamp.from(Instant.now()) + "\n");
+                fw.close();
             }
 
             if(userFound) {
                 if (loginPasswordField.getText().equals(password)) {        //insecure, should be checked on database if you don't trust the client
+
+                    //Log the successful login
+                    String filename= "loginActivityLog.txt";
+                    FileWriter fw = new FileWriter(filename,true);  //set to true so data is appended to existing file
+                    fw.write("Successful login attempt. User: " + userInputName +" at time: " + Timestamp.from(Instant.now()) + "\n");
+                    fw.close();
+
                     Controller c = new GuiController(userName);
                     loadScene(c, event, "ScheduleManager/Views/gui.fxml", 900, 475, bundle);
 
@@ -136,7 +147,7 @@ public class LoginController extends Controller {
                                 Alert a = new Alert(Alert.AlertType.INFORMATION);
                                 Timestamp start = appointment.getStart();
                                 start = Timestamp.valueOf(start.toLocalDateTime().plus(offset.getTotalSeconds(), ChronoUnit.SECONDS));      //offset database time to local user time
-                                a.setContentText("There is an upcoming appointment for you: \n Appointment ID: " + appointment.getId() + "\n Appointment Date: " + start);
+                                a.setContentText(bundle.getString("ThereIsAnUpcomingAppointmentForYou") + " \n " + bundle.getString("AppointmentID") + ": " + appointment.getId() + "\n" +  bundle.getString("AppointmentDate")+  ": " + start);
                                 a.show();
                                 upcomingAppt.set(true);
                                 return;
@@ -148,7 +159,7 @@ public class LoginController extends Controller {
                     if(upcomingAppt.get()){
                     } else {
                         Alert a = new Alert(Alert.AlertType.INFORMATION);
-                        a.setContentText("No upcoming appointments for you.");
+                        a.setContentText(bundle.getString("NoUpcomingAppointmentsForYou"));
                         a.show();
                     }
 
@@ -166,6 +177,8 @@ public class LoginController extends Controller {
 
         } catch (SQLException e){
             e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

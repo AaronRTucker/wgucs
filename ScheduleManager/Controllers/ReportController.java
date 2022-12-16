@@ -76,7 +76,9 @@ public class ReportController extends Controller {
 
     @FXML private Button cancelButton;
 
-    @FXML public ComboBox<String> contactDropdown;
+    @FXML private ComboBox<String> contactDropdown;
+
+    @FXML private TextField apptTotal;
 
     Report report;
 
@@ -117,7 +119,7 @@ C.  Write code that provides the ability to track user activity by recording all
          */
         bundle = resourceBundle;
 
-        contactDropdown.setPromptText("Select a contact");
+        contactDropdown.setPromptText(bundle.getString("SelectAContact"));
         //Get contacts list from database
         ArrayList<String> contacts = DatabaseQueryHelper.getContacts();
 
@@ -127,13 +129,18 @@ C.  Write code that provides the ability to track user activity by recording all
         }
 
         //Change default table placeholder messages
-        MonthsTable.setPlaceholder(new Label("Months list is empty"));
-        TypesTable.setPlaceholder(new Label("Types list is empty"));
-        AppointmentsTable.setPlaceholder(new Label("Appointments list is empty"));
+        MonthsTable.setPlaceholder(new Label(bundle.getString("MonthsListIsEmpty")));
+        TypesTable.setPlaceholder(new Label(bundle.getString("TypesListIsEmpty")));
+        AppointmentsTable.setPlaceholder(new Label(bundle.getString("AppointmentsListIsEmpty")));
+
+
 
 
         //Get appointment table data from MYSQL database
         DatabaseQueryHelper.getAllAppointments(schedule);
+
+        //Add the report for the total number of appointments in the system
+        apptTotal.setText("Total: " + schedule.getAllAppointments().size());
 
         //Process the schedule data into a report object
         report = new Report();
@@ -199,6 +206,7 @@ C.  Write code that provides the ability to track user activity by recording all
         });
 
 
+
         //AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<>("end")); //replaced with timezone offset version below
         AppointmentEndCol.setCellValueFactory(appt -> {
             //Convert from UTC stored in the database to local timezone in the app
@@ -209,6 +217,18 @@ C.  Write code that provides the ability to track user activity by recording all
             return Bindings.createStringBinding(() -> "" + endTime.toLocalDateTime().plus(offset.getTotalSeconds(), ChronoUnit.SECONDS) + " " + ZoneId.systemDefault());
         });
         AppointmentCustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
+
+        //Set labels according to locale:
+        AppointmentIdCol.setText(bundle.getString("ID"));
+        AppointmentTitleCol.setText(bundle.getString("Title"));
+        AppointmentDescriptionCol.setText(bundle.getString("Description"));
+        AppointmentContactCol.setText(bundle.getString("Contact"));
+        AppointmentTypeCol.setText(bundle.getString("Type"));
+        AppointmentStartCol.setText(bundle.getString("Start"));
+        AppointmentEndCol.setText(bundle.getString("End"));
+        AppointmentCustomerIdCol.setText(bundle.getString("CustomerID"));
+
+
         AppointmentsTable.setItems(schedule.getContactsAppointments(selectedContact));
         AppointmentsTable.refresh();
     }

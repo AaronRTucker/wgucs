@@ -142,7 +142,7 @@ public class ModifyCustomerController extends Controller {
 
         //once country is changed, division can't be kept valid
         selectedDivision="";
-        divisionComboBox.setPromptText("Select a division");
+        divisionComboBox.setPromptText(bundle.getString("SelectADivision"));
 
         //Get country ID from selected country name
         selectedCountryID = DatabaseQueryHelper.getCountryID(selectedCountry);
@@ -190,11 +190,11 @@ public class ModifyCustomerController extends Controller {
 
                 if (name.equals("") || address.equals("") || postalCode.equals("") || phoneNumber.equals("")) {
                     Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setContentText("Text Fields must not be empty");
+                    a.setContentText(bundle.getString("TextFieldsMustNotBeEmpty"));
                     a.show();
                 } else if(selectedDivisionID == -1){
                     Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setContentText("Please select a state");
+                    a.setContentText(bundle.getString("PleaseSelectAState"));
                     a.show();
                 } else {
                     //Input is good
@@ -205,7 +205,7 @@ public class ModifyCustomerController extends Controller {
                 }
             } catch (Exception e) {
                 Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setContentText("Inappropriate user input: " + e.getMessage());
+                a.setContentText(bundle.getString("InappropriateUserInput")+ ": " + e.getMessage());
                 a.show();
             }
         }

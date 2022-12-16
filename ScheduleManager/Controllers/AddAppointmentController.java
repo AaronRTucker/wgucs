@@ -127,9 +127,9 @@ public class AddAppointmentController extends Controller {
 
 
         //Set default prompts
-        contactDropdown.setPromptText("Select a contact");
-        customerIdDropdown.setPromptText("Select a customer ID");
-        userIdDropdown.setPromptText("Select a user ID");
+        contactDropdown.setPromptText(bundle.getString("SelectAContact"));
+        customerIdDropdown.setPromptText(bundle.getString("SelectACustomerID"));
+        userIdDropdown.setPromptText(bundle.getString("SelectAUserID"));
 
 
         //Get contacts list from database
@@ -242,23 +242,19 @@ public class AddAppointmentController extends Controller {
 
                 if (title.equals("") || description.equals("") || location.equals("") || type.equals("") || selectedUserID==-1 || selectedContactId==-1 || selectedCustomerID==-1) {
                     Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setContentText("Input Fields must not be empty");
+                    a.setContentText(bundle.getString("InputFieldsMustNotBeEmpty"));
                     a.show();
                 } else if(startMinute == -1 || startHour == -1 || endMinute == -1 || endHour == -1) {
                     Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setContentText("Time Fields must not be empty");
+                    a.setContentText(bundle.getString("TimeFieldsMustNotBeEmpty"));
                     a.show();
                 } else if(startDateString.equals("") || endDateString.equals("")){
                     Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setContentText("Date Fields must not be empty");
+                    a.setContentText(bundle.getString("DateFieldsMustNotBeEmpty"));
                     a.show();
                 }else{
                     //User input is good
 
-                    //Need to change datetime to UTC - done, test this
-                    //Need to check if the app end time is after the start time - done, test this
-                    //Need to check if the app start and end time is between business hours EST time  - done, test this
-                    //Need to make sure schedules don't overlap
 
 
                     //Format date inputs into a unified timestamp for start and end
@@ -331,43 +327,31 @@ public class AddAppointmentController extends Controller {
                         }
                     });
 
-                    //System.out.println(easternStartInt);
-                    //System.out.println(easternEndInt);
-
                     if(selectedStart.after(selectedEnd)){
                         Alert a = new Alert(Alert.AlertType.ERROR);
-                        a.setContentText("End time must be after start time");
+                        a.setContentText(bundle.getString("EndTimeMustBeAfterStartTime"));
                         a.show();
                     }else if(easternStartInt < 8){
                         Alert a = new Alert(Alert.AlertType.ERROR);
-                        a.setContentText("Start time must be after 8AM EST");
+                        a.setContentText(bundle.getString("StartTimeMustBeAfter8"));
                         a.show();
                     } else if(easternEndInt >= 20){
                         Alert a = new Alert(Alert.AlertType.ERROR);
-                        a.setContentText("End time must be before 10PM EST");
+                        a.setContentText(bundle.getString("EndTimeMustBeBefore10"));
                         a.show();
                     } else if(conflict.get()){
                         Alert a = new Alert(Alert.AlertType.ERROR);
-                        a.setContentText("Appointment time conflicts with an existing appointment time for this customer");
+                        a.setContentText(bundle.getString("AppointmentTimeConflicts"));
                         a.show();
                     }
                     else {
                         DatabaseQueryHelper.addAppointment(id, title, description, location, selectedContactId, type, selectedStart, selectedEnd, selectedUserID, selectedCustomerID, userName);
                         addAppointmentCancelPressed(event);        //return to home screen if there are no errors
                     }
-
-
-
-
-                    //check if times overlap
-
-
-                    //System.out.println(selectedStart);
-
                 }
             } catch (Exception e) {
                 Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setContentText("Inappropriate user input: " + e.getMessage());
+                a.setContentText(bundle.getString("InappropriateUserInput") +": " + e.getMessage());
                 a.show();
             }
         }
