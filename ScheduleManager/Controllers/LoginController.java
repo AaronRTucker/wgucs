@@ -111,7 +111,7 @@ public class LoginController extends Controller {
                 if (loginPasswordField.getText().equals(password)) {        //insecure, should be checked on database if you don't trust the client
 
                     //Log the successful login
-                    String filename= "loginActivityLog.txt";
+                    String filename= "login_activity.txt";
                     FileWriter fw = new FileWriter(filename,true);  //set to true so data is appended to existing file
                     fw.write("Successful login attempt. User: " + userInputName +" at time: " + Timestamp.from(Instant.now()) + "\n");
                     fw.close();

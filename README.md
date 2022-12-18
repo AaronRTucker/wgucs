@@ -6,7 +6,7 @@ The purpose of this application is to provide a GUI interface to a scheduling da
 
 Author: Aaron Tucker
 Contact: ARTuckerAustin@gmail.com, atuck88@wgu.edu
-Version: 1.0
+Version: 1.4
 Date: 12/16/2022
 
 IDE: IntelliJ version 2022.1.3(Community Edition)
@@ -22,4 +22,6 @@ Added the ability to display the total number of appointments in the system.
 
 MySQL connector version:
 mysql_connector_java_8_0_29
+
+Lambda functions can be found in the javadoc under Controllers/GuiController.java
 
