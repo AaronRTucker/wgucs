@@ -137,17 +137,17 @@ public class LoginController extends Controller {
                     ZoneId zone = ZoneId.systemDefault();
                     ZonedDateTime zdt = dt.atZone(zone);
                     ZoneOffset offset = zdt.getOffset();
-                    Timestamp currentTime = Timestamp.valueOf(dt.minus(offset.getTotalSeconds(), ChronoUnit.SECONDS));
-                    Timestamp currentPlusFifteen = Timestamp.valueOf(dt.minus(offset.getTotalSeconds() -900 , ChronoUnit.SECONDS));
+                    Timestamp currentTime = Timestamp.valueOf(dt);
+                    Timestamp currentPlusFifteen = Timestamp.valueOf(dt.plusMinutes(15));
 
                     //check if any of the user's appointments' start times are in the next 15 minutes
                     userAppointments.forEach(appointment -> {
-                        if(appointment.getStart().after(currentTime)){
-                            if(appointment.getStart().before(currentPlusFifteen)){
+                        Timestamp start = appointment.getStart();
+                        start = Timestamp.valueOf(start.toLocalDateTime());      //offset database time to local user time
+                        if(start.after(currentTime)){
+                            if(start.before(currentPlusFifteen)){
                                 Alert a = new Alert(Alert.AlertType.INFORMATION);
-                                Timestamp start = appointment.getStart();
-                                start = Timestamp.valueOf(start.toLocalDateTime().plus(offset.getTotalSeconds(), ChronoUnit.SECONDS));      //offset database time to local user time
-                                a.setContentText(bundle.getString("ThereIsAnUpcomingAppointmentForYou") + " \n " + bundle.getString("AppointmentID") + ": " + appointment.getId() + "\n" +  bundle.getString("AppointmentDate")+  ": " + start);
+                                a.setContentText(bundle.getString("ThereIsAnUpcomingAppointmentForYou") + " \n " + bundle.getString("AppointmentID") + appointment.getId() + "\n" +  bundle.getString("AppointmentDate") + start);
                                 a.show();
                                 upcomingAppt.set(true);
                             }
