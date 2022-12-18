@@ -101,7 +101,7 @@ public class LoginController extends Controller {
                 a.setContentText(bundle.getString("NoUserFound"));
                 a.show();
 
-                String filename= "loginActivityLog.txt";
+                String filename= "login_activity.txt";
                 FileWriter fw = new FileWriter(filename,true);  //set to true so data is appended to existing file
                 fw.write("Incorrect login attempt. User: " + userInputName +" at time: " + Timestamp.from(Instant.now()) + "\n");
                 fw.close();
@@ -150,13 +150,13 @@ public class LoginController extends Controller {
                                 a.setContentText(bundle.getString("ThereIsAnUpcomingAppointmentForYou") + " \n " + bundle.getString("AppointmentID") + ": " + appointment.getId() + "\n" +  bundle.getString("AppointmentDate")+  ": " + start);
                                 a.show();
                                 upcomingAppt.set(true);
-                                return;
                             }
                         }
                     });
 
 
                     if(upcomingAppt.get()){
+                        System.out.println("An upcoming appointment found");
                     } else {
                         Alert a = new Alert(Alert.AlertType.INFORMATION);
                         a.setContentText(bundle.getString("NoUpcomingAppointmentsForYou"));
