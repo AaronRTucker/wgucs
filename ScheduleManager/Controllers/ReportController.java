@@ -27,6 +27,8 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class ReportController extends Controller {
@@ -147,9 +149,10 @@ C.  Write code that provides the ability to track user activity by recording all
 
         ObservableList<Appointment> appointments = schedule.getAllAppointments();
         for (Appointment appointment : appointments) {
-            Timestamp start = appointment.getStart();
-            int year = start.getYear() + 1900;
-            int month = start.getMonth();
+            Calendar start = Calendar.getInstance();
+            start.setTime(appointment.getStart());
+            int year = start.get(Calendar.YEAR);
+            int month = start.get(Calendar.MONTH);
             report.addMonth(year, month);
             report.addType(appointment.getType());
         }
@@ -249,19 +252,19 @@ C.  Write code that provides the ability to track user activity by recording all
 
 
 
-    protected class MonthTotal{
+    protected static class MonthTotal{
 
 
-        private int year;
-        private int month;
-        private String[] names = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-        private String name;
+        private final int year;
+        private final int month;
+        private final String name;
         private int total;
 
         private MonthTotal(int year, int month){
             this.year = year;
             this.month = month;
-            this.name = names[month-1];
+            String[] names = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+            this.name = names[month];
             this.total = 1;
         }
 
@@ -286,7 +289,7 @@ C.  Write code that provides the ability to track user activity by recording all
         }
     }
 
-    protected class TypeTotal{
+    protected static class TypeTotal{
 
         public String getTypeName() {
             return typeName;
@@ -296,7 +299,7 @@ C.  Write code that provides the ability to track user activity by recording all
             return typeTotal;
         }
 
-        private String typeName;
+        private final String typeName;
         private int typeTotal;
 
         private TypeTotal(String name){
@@ -310,7 +313,7 @@ C.  Write code that provides the ability to track user activity by recording all
     }
     
     
-    private class Report{
+    private static class Report{
         private final ObservableList<MonthTotal> allMonths;
         private final ObservableList<TypeTotal> allTypes;
 
@@ -321,9 +324,9 @@ C.  Write code that provides the ability to track user activity by recording all
         
         public void addMonth(int year, int month){
             if(checkMonthTotal(year,month)) {
-                returnMonthTotal(year, month).addOne();
+                Objects.requireNonNull(returnMonthTotal(year, month)).addOne();
             } else {
-                allMonths.add(new MonthTotal(year,month));
+                allMonths.add(new MonthTotal(year, month));
             }
         }
 
@@ -350,7 +353,7 @@ C.  Write code that provides the ability to track user activity by recording all
 
         public void addType(String name){
             if(checkTypeTotal(name)) {
-                returnTypeTotal(name).addOne();
+                Objects.requireNonNull(returnTypeTotal(name)).addOne();
             } else {
                 allTypes.add(new TypeTotal(name));
             }

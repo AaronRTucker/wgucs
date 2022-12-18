@@ -262,18 +262,20 @@ public class AddAppointmentController extends Controller {
                     LocalTime timePart = LocalTime.parse(startHour+":"+startMinute, DateTimeFormatter.ofPattern("H:m"));
                     LocalDateTime dt = LocalDateTime.of(datePart, timePart);
 
-                    //add the local time offset
+                    //add the local time offset to convert to UTC
                     ZoneId zone = ZoneId.systemDefault();
                     ZonedDateTime zdt = dt.atZone(zone);
                     ZoneOffset offset = zdt.getOffset();
                     selectedStart = Timestamp.valueOf(dt.minus(offset.getTotalSeconds(), ChronoUnit.SECONDS));
+                    System.out.println("Start: " + selectedStart);
 
                     datePart = LocalDate.parse(endDateString);
                     timePart = LocalTime.parse(endHour+":"+endMinute, DateTimeFormatter.ofPattern("H:m"));
                     dt = LocalDateTime.of(datePart, timePart);
 
-                    //add the local time offset
+                    //add the local time offset to convert to UTC
                     selectedEnd = Timestamp.valueOf(dt.minus(offset.getTotalSeconds(), ChronoUnit.SECONDS));
+                    System.out.println("End: " + selectedEnd);
 
 
 

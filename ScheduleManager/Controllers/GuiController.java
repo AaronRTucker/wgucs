@@ -24,7 +24,6 @@ import javafx.scene.input.KeyEvent;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
 import java.util.Optional;
@@ -131,6 +130,11 @@ public class GuiController extends Controller {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
 
+        //initialize week/month search with today's date to avoid null error
+        Locale locale = Locale.getDefault();
+        LocalDate date = LocalDate.now();
+        monthNumberSelected = date.getMonthValue();
+
         initClocks();
 
         //initialize radio button flip/flop logic
@@ -172,6 +176,8 @@ public class GuiController extends Controller {
 
         //Set up appointment date filter callback function
         setupAppointmentTableDateSearch();
+
+        dateFilter.valueProperty().setValue(date);      //trigger event listener to filter appointments to current month
 
     }
 
@@ -362,7 +368,7 @@ public class GuiController extends Controller {
         }else{  //everything is checked, just need to confirm deletion
             a = new Alert(Alert.AlertType.CONFIRMATION);
             a.setTitle(bundle.getString("AppointmentDeletion"));
-            a.setHeaderText(bundle.getString("YouAreAboutToDelete")+ ": " + selectedAppointment.getTitle());
+            a.setHeaderText(bundle.getString("YouAreAboutToDelete")+ " \nAppointment ID:" + selectedAppointment.getId() + "\nAppointment Title: " + selectedAppointment.getTitle() + "\nAppointment Type: " + selectedAppointment.getType());
             a.setContentText(bundle.getString("AreYouSureYouWantToDoThis"));
             result = a.showAndWait();
             if(result.isPresent()){
@@ -422,9 +428,10 @@ public class GuiController extends Controller {
 
 
     /**
-     * Populates the appointment table.  Lambda expressions used to functionally generate the correct object to return inline
+     * Populates the appointment table.
+     * Lambda method is used as an anonymous callback function, taking in the appt object and returning an object with the correct local timezone offset
      */
-    private void populateAppointmentsTable(){
+    public void populateAppointmentsTable(){
         AppointmentIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         AppointmentTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         AppointmentDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -438,7 +445,7 @@ public class GuiController extends Controller {
             ZoneId zone = ZoneId.systemDefault();
             ZonedDateTime zdt = startTime.toLocalDateTime().atZone(zone);
             ZoneOffset offset = zdt.getOffset();
-            return Bindings.createStringBinding(() -> "" + startTime.toLocalDateTime().plus(offset.getTotalSeconds(), ChronoUnit.SECONDS) + " " + ZoneId.systemDefault());
+            return Bindings.createStringBinding(() -> "" + startTime.toLocalDateTime() + " " + ZoneId.systemDefault());
         });
 
 
@@ -449,7 +456,7 @@ public class GuiController extends Controller {
             ZoneId zone = ZoneId.systemDefault();
             ZonedDateTime zdt = endTime.toLocalDateTime().atZone(zone);
             ZoneOffset offset = zdt.getOffset();
-            return Bindings.createStringBinding(() -> "" + endTime.toLocalDateTime().plus(offset.getTotalSeconds(), ChronoUnit.SECONDS) + " " + ZoneId.systemDefault());
+            return Bindings.createStringBinding(() -> "" + endTime.toLocalDateTime() + " " + ZoneId.systemDefault());
         });
         AppointmentCustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
         AppointmentUserIdCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
@@ -458,9 +465,10 @@ public class GuiController extends Controller {
 
 
     /**
-     * Sets up the customer table to be searched.  Lambda used to easily create that function inline
+     * Sets up the customer table to be searched.
+     * Lambda method creates an anonymous listener function to handle the search filtering
      */
-    private void setupCustomerTableSearch(){
+    public void setupCustomerTableSearch(){
         //Set up anonymous callback function for the event listener on the Customers search field
         //Lambda expressions used to set up the search function inline
         filteredCustomers = new FilteredList<>(schedule.getAllCustomers(), p -> true);
@@ -478,9 +486,10 @@ public class GuiController extends Controller {
     }
 
     /**
-     * Sets up the appointment table to be searched.  Lambda used to easily create that function inline
+     * Sets up the appointment table to be searched.
+     * Lambda method creates an anonymous listener function to handle the search filtering
      */
-    private void setupAppointmentTableSearch(){
+    public void setupAppointmentTableSearch(){
         //Set up anonymous callback function for the event listener on the Appointments search field
         //Lambda expressions used to set up the search function inline
         filteredAppointments = new FilteredList<>(schedule.getAllAppointments(), p -> true);
@@ -501,9 +510,10 @@ public class GuiController extends Controller {
     }
 
     /**
-     * Sets up the appointment table to be searched by date.  Lambda used to easily create that function inline
+     * Sets up the appointment table to be searched by date.
+     * Lambda method creates an anonymous listener function to handle the search filtering
      */
-    private void setupAppointmentTableDateSearch(){
+    public void setupAppointmentTableDateSearch(){
         //Set up anonymous callback function for the event listener on the Appointments date filter
         //Lambda expressions used to set up the search function inline
         filteredAppointments = new FilteredList<>(schedule.getAllAppointments(), p -> true);
