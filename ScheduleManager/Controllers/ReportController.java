@@ -31,6 +31,9 @@ import java.util.Calendar;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * The type Report controller.
+ */
 public class ReportController extends Controller {
 
 
@@ -61,6 +64,9 @@ public class ReportController extends Controller {
     @FXML private TableColumn<Customer, String> AppointmentTitleCol;
     @FXML private TableColumn<Schedule, String> AppointmentDescriptionCol;
     @FXML private TableColumn<Schedule, String> AppointmentTypeCol;
+    /**
+     * The Appointment contact col.
+     */
     @FXML public TableColumn<Schedule, String> AppointmentContactCol;
     @FXML private TableColumn<Appointment, String> AppointmentStartCol;
     @FXML private TableColumn<Appointment, String> AppointmentEndCol;
@@ -82,10 +88,18 @@ public class ReportController extends Controller {
 
     @FXML private TextField apptTotal;
 
+    /**
+     * The Report.
+     */
     Report report;
 
 
-    //Constructor for new Controller object
+    /**
+     * Instantiates a new Report controller.
+     *
+     * @param userName the user name
+     */
+//Constructor for new Controller object
     public ReportController(String userName){
         this.userName = userName;
         this.schedule = new Schedule();
@@ -168,6 +182,7 @@ C.  Write code that provides the ability to track user activity by recording all
 
     /**
      * Handle cancelling out
+     *
      * @param event the action event
      */
     @FXML
@@ -179,6 +194,7 @@ C.  Write code that provides the ability to track user activity by recording all
 
     /**
      * Handles contact combobox
+     *
      * @param event the action event
      */
     @FXML
@@ -189,10 +205,12 @@ C.  Write code that provides the ability to track user activity by recording all
     }
 
 
-
-
-
-    private void populateAppointmentsTable(){
+    /**
+     * LAMBDA
+     * Populates the appointment table.
+     * Lambda method is used as an anonymous callback function, taking in the appt object and returning an object with the correct local timezone offset
+     */
+    public void populateAppointmentsTable(){
         AppointmentIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         AppointmentTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         AppointmentDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -205,7 +223,7 @@ C.  Write code that provides the ability to track user activity by recording all
             ZoneId zone = ZoneId.systemDefault();
             ZonedDateTime zdt = startTime.toLocalDateTime().atZone(zone);
             ZoneOffset offset = zdt.getOffset();
-            return Bindings.createStringBinding(() -> "" + startTime.toLocalDateTime().plus(offset.getTotalSeconds(), ChronoUnit.SECONDS) + " " + ZoneId.systemDefault());
+            return Bindings.createStringBinding(() -> "" + startTime.toLocalDateTime() + " " + ZoneId.systemDefault());
         });
 
 
@@ -217,7 +235,7 @@ C.  Write code that provides the ability to track user activity by recording all
             ZoneId zone = ZoneId.systemDefault();
             ZonedDateTime zdt = endTime.toLocalDateTime().atZone(zone);
             ZoneOffset offset = zdt.getOffset();
-            return Bindings.createStringBinding(() -> "" + endTime.toLocalDateTime().plus(offset.getTotalSeconds(), ChronoUnit.SECONDS) + " " + ZoneId.systemDefault());
+            return Bindings.createStringBinding(() -> "" + endTime.toLocalDateTime() + " " + ZoneId.systemDefault());
         });
         AppointmentCustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
 
@@ -251,7 +269,9 @@ C.  Write code that provides the ability to track user activity by recording all
     }
 
 
-
+    /**
+     * The type Month total.
+     */
     protected static class MonthTotal{
 
 
@@ -268,33 +288,69 @@ C.  Write code that provides the ability to track user activity by recording all
             this.total = 1;
         }
 
+        /**
+         * Add one.
+         */
         public void addOne(){
             total++;
         }
-        
+
+        /**
+         * Get name string.
+         *
+         * @return the string
+         */
         public String getName(){
             return this.name;
         }
 
+        /**
+         * Gets year.
+         *
+         * @return the year
+         */
         public int getYear() {
             return this.year;
         }
 
+        /**
+         * Gets month.
+         *
+         * @return the month
+         */
         public int getMonth() {
             return this.month;
         }
 
+        /**
+         * Gets total.
+         *
+         * @return the total
+         */
         public int getTotal() {
             return this.total;
         }
     }
 
+    /**
+     * The type Type total.
+     */
     protected static class TypeTotal{
 
+        /**
+         * Gets type name.
+         *
+         * @return the type name
+         */
         public String getTypeName() {
             return typeName;
         }
 
+        /**
+         * Gets type total.
+         *
+         * @return the type total
+         */
         public int getTypeTotal() {
             return typeTotal;
         }
@@ -307,6 +363,9 @@ C.  Write code that provides the ability to track user activity by recording all
             typeTotal = 1;
         }
 
+        /**
+         * Add one.
+         */
         public void addOne(){
             typeTotal++;
         }
@@ -317,11 +376,20 @@ C.  Write code that provides the ability to track user activity by recording all
         private final ObservableList<MonthTotal> allMonths;
         private final ObservableList<TypeTotal> allTypes;
 
+        /**
+         * Instantiates a new Report.
+         */
         public Report(){
             allMonths = FXCollections.observableArrayList();
             allTypes = FXCollections.observableArrayList();
         }
-        
+
+        /**
+         * Add month.
+         *
+         * @param year  the year
+         * @param month the month
+         */
         public void addMonth(int year, int month){
             if(checkMonthTotal(year,month)) {
                 Objects.requireNonNull(returnMonthTotal(year, month)).addOne();
@@ -330,6 +398,13 @@ C.  Write code that provides the ability to track user activity by recording all
             }
         }
 
+        /**
+         * Check month total.
+         *
+         * @param year  the year
+         * @param month the month
+         * @return the boolean
+         */
         public boolean checkMonthTotal(int year, int month){
             for (MonthTotal monthTotal : this.allMonths) {
                 if (monthTotal.getMonth() == month) {
@@ -340,6 +415,14 @@ C.  Write code that provides the ability to track user activity by recording all
             }
             return false;    //no month found
         }
+
+        /**
+         * Return month total.
+         *
+         * @param year  the year
+         * @param month the month
+         * @return the month total
+         */
         public MonthTotal returnMonthTotal(int year, int month){
             for (MonthTotal monthTotal : this.allMonths) {
                 if (monthTotal.getMonth() == month) {
@@ -351,6 +434,11 @@ C.  Write code that provides the ability to track user activity by recording all
             return null;    //no month found
         }
 
+        /**
+         * Add type.
+         *
+         * @param name the name
+         */
         public void addType(String name){
             if(checkTypeTotal(name)) {
                 Objects.requireNonNull(returnTypeTotal(name)).addOne();
@@ -359,6 +447,12 @@ C.  Write code that provides the ability to track user activity by recording all
             }
         }
 
+        /**
+         * Check type total boolean.
+         *
+         * @param name the name
+         * @return the boolean
+         */
         public boolean checkTypeTotal(String name){
             for (TypeTotal typeTotal : this.allTypes) {
                 if (typeTotal.getTypeName().equals(name)){
@@ -367,6 +461,13 @@ C.  Write code that provides the ability to track user activity by recording all
             }
             return false;    //no type found
         }
+
+        /**
+         * Return type total.
+         *
+         * @param name the name
+         * @return the type total
+         */
         public TypeTotal returnTypeTotal(String name){
             for (TypeTotal typeTotal : this.allTypes) {
                 if (typeTotal.getTypeName().equals(name)){
@@ -376,9 +477,20 @@ C.  Write code that provides the ability to track user activity by recording all
             return null;    //no type found
         }
 
+        /**
+         * Get all month totals.
+         *
+         * @return the observable list
+         */
         public ObservableList<MonthTotal> getAllMonthTotals(){
             return allMonths;
         }
+
+        /**
+         * Get all type totals.
+         *
+         * @return the observable list
+         */
         public ObservableList<TypeTotal> getAllTypeTotals(){
             return allTypes;
         }

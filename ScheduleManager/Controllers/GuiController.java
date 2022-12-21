@@ -428,6 +428,7 @@ public class GuiController extends Controller {
 
 
     /**
+     * LAMBDA
      * Populates the appointment table.
      * Lambda method is used as an anonymous callback function, taking in the appt object and returning an object with the correct local timezone offset
      */
@@ -465,6 +466,7 @@ public class GuiController extends Controller {
 
 
     /**
+     * LAMBDA
      * Sets up the customer table to be searched.
      * Lambda method creates an anonymous listener function to handle the search filtering
      */
@@ -486,6 +488,7 @@ public class GuiController extends Controller {
     }
 
     /**
+     * LAMBDA
      * Sets up the appointment table to be searched.
      * Lambda method creates an anonymous listener function to handle the search filtering
      */
@@ -510,6 +513,7 @@ public class GuiController extends Controller {
     }
 
     /**
+     * LAMBDA
      * Sets up the appointment table to be searched by date.
      * Lambda method creates an anonymous listener function to handle the search filtering
      */

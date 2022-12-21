@@ -336,6 +336,9 @@ public class ModifyAppointmentController extends Controller {
         loadScene(c, event, "ScheduleManager/Views/gui.fxml", 900, 475, bundle);
     }
 
+    /**
+     * Imports data from the database and sets all local program variables to display that data in the GUI
+     */
     public void importAppointmentData(){
         appointmentIdField.setEditable(false);
         appointmentIdField.setText(String.valueOf(selectedAppointment.getId()));
